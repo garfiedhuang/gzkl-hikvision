@@ -111,6 +111,9 @@
     <Compile Include="Common\Win32Helper.cs" />
     <Compile Include="Converters\CheckConverter.cs" />
     <Compile Include="Converters\EnumConverter.cs" />
+    <Compile Include="HikvisionWindow.xaml.cs">
+      <DependentUpon>HikvisionWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
@@ -152,6 +155,10 @@
     <Page Include="Assets\Style\style.xaml">
       <SubType>Designer</SubType>
       <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="HikvisionWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="MainWindow.xaml">
       <SubType>Designer</SubType>
