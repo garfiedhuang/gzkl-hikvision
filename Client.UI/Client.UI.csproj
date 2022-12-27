@@ -241,9 +241,7 @@
     <Resource Include="Assets\Images\icon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Assets\Scripts\sha.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <Content Include="Assets\Scripts\sha.js" />
     <Content Include="Database\JCDVRRecord.mdb">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
