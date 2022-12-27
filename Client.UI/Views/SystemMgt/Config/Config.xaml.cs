@@ -21,7 +21,7 @@ namespace GZKL.Client.UI.Views.SystemMgt.Config
     /// <summary>
     /// Config.xaml 的交互逻辑
     /// </summary>
-    public partial class Config : UserControl
+    public partial class Config
     {
         public Config()
         {

@@ -152,6 +152,9 @@
     <Compile Include="Views\SystemMgt\Config\Config.xaml.cs">
       <DependentUpon>Config.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\SystemMgt\Device\Device.xaml.cs">
+      <DependentUpon>Device.xaml</DependentUpon>
+    </Compile>
     <Page Include="Assets\Style\style.xaml">
       <SubType>Designer</SubType>
       <Generator>XamlIntelliSenseFileGenerator</Generator>
@@ -183,6 +186,10 @@
     <Page Include="Views\SystemMgt\Config\Config.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\SystemMgt\Device\Device.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>

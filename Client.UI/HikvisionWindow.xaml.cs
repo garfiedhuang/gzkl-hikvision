@@ -7,6 +7,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Controls.Primitives;
+using GZKL.Client.UI.Views.SystemMgt.Device;
+using HandyControl.Tools.Extension;
 
 namespace GZKL.Client.UI
 {
@@ -63,72 +65,11 @@ namespace GZKL.Client.UI
             this.Close();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void btnDevice_Click(object sender, RoutedEventArgs e)
         {
-            Button btn = (Button)sender;
-            Grid gridtemp = (Grid) btn.Template.FindName("gridtemp",btn);
-            Popup menuPop = (Popup)gridtemp.FindName("menuPop");
-            menuPop.IsOpen = true;
-        }
-
-        private void btnDeviceManagement_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void btnCheckTime_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void btnRegister_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void btnExit_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void btnStartPlay_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void btnStopPlay_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void btnDownload_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void btnPausePlay_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void btnRecoverPlay_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void btnFastPlay_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void btnSlowPlay_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void btnQuery_Click(object sender, RoutedEventArgs e)
-        {
-
+            var window = new Device();
+            window.Owner = Application.Current.MainWindow;
+            window.ShowDialog();
         }
     }
 }
