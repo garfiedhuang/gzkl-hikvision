@@ -122,10 +122,14 @@
                 <Grid x:Name="gdThird" Grid.Column="0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"></RowDefinition>
-                        <RowDefinition Height="20"></RowDefinition>
+                        <!--<RowDefinition Height="20"></RowDefinition>-->
                     </Grid.RowDefinitions>
-                    <hc:SimplePanel Grid.Row="0" Background="Black"></hc:SimplePanel>
-                    <hc:SimplePanel Grid.Row="1" Background="Blue" ></hc:SimplePanel>
+                    <hc:SimplePanel Grid.Row="0" Background="Black">
+
+                        <ProgressBar Height="20" Value="77.78" Margin="0" VerticalAlignment="Bottom"/>
+                        <!--<hc:SimplePanel Height="20" Background="Blue" VerticalAlignment="Bottom" ></hc:SimplePanel>-->
+                    </hc:SimplePanel>
+                    <!--<hc:SimplePanel Grid.Row="1" Background="Blue" ></hc:SimplePanel>-->
                 </Grid>
                 <Grid x:Name="gdFour" Grid.Column="1">
                     <Grid.RowDefinitions>
