@@ -1,8 +1,8 @@
 ﻿using GalaSoft.MvvmLight;
 using GZKL.Client.UI.Common;
 using GZKL.Client.UI.Models;
-using LiveCharts;
-using LiveCharts.Defaults;
+//using LiveCharts;
+//using LiveCharts.Defaults;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -31,10 +31,10 @@ namespace GZKL.Client.UI.ViewsModels
         }
         #region =====data
         List<Task> taskList = new List<Task>();
-        public SeriesCollection SeriesCollection { get; set; }
-        public SeriesCollection SeriesCollection1 { get; set; }
-        public ChartValues<ObservableValue> MemValues { get; set; } = new ChartValues<ObservableValue>();
-        public ChartValues<ObservableValue> CPUValues { get; set; }
+        //public SeriesCollection SeriesCollection { get; set; }
+        //public SeriesCollection SeriesCollection1 { get; set; }
+        //public ChartValues<ObservableValue> MemValues { get; set; } = new ChartValues<ObservableValue>();
+        //public ChartValues<ObservableValue> CPUValues { get; set; }
         private ObservableCollection<UserModel> gridModelList;
         public ObservableCollection<UserModel> GridModelList
         {
@@ -49,8 +49,8 @@ namespace GZKL.Client.UI.ViewsModels
             {
                 currentCpu = Math.Ceiling(value);
 
-                this.CPUValues.Add(new ObservableValue(currentCpu));
-                this.CPUValues.RemoveAt(0);
+                //this.CPUValues.Add(new ObservableValue(currentCpu));
+                //this.CPUValues.RemoveAt(0);
             }
         }
         private double currnetMem;
@@ -62,22 +62,22 @@ namespace GZKL.Client.UI.ViewsModels
             {
                 currnetMem = Math.Ceiling(value);
 
-                this.MemValues.Add(new ObservableValue(currnetMem));
-                this.MemValues.RemoveAt(0);
+                //this.MemValues.Add(new ObservableValue(currnetMem));
+                //this.MemValues.RemoveAt(0);
             }
         }
         #endregion
 
         #region =====methods
-        bool taskSwitch = true;
-        Random random = new Random();
+        //bool taskSwitch = true;
+        //Random random = new Random();
         private void InitCPUDatas()
         {
-            this.CPUValues = new ChartValues<ObservableValue>();
-            for (int i = 0; i < 40; i++)
-            {
-                this.CPUValues.Add(new ObservableValue(0.0f));
-            }
+            //this.CPUValues = new ChartValues<ObservableValue>();
+            //for (int i = 0; i < 40; i++)
+            //{
+            //    this.CPUValues.Add(new ObservableValue(0.0f));
+            //}
 
             ComputerInfo monitor = ComputerInfo.GetInstance();
 
@@ -94,26 +94,26 @@ namespace GZKL.Client.UI.ViewsModels
         }
         private void InitMemDatas()
         {
-            this.MemValues.Clear();
-            for (int i = 0; i < 40; i++)
-            {
-                this.MemValues.Add(new ObservableValue(0.0f));
-            }
-            var task = Task.Factory.StartNew(new Action(async () =>
-            {
-                while (taskSwitch)
-                {
-                    this.CurrentMem = random.Next((int)Math.Max(this.CurrentMem - 5, 0), (int)(this.CurrentMem + 5));
-                    await Task.Delay(1000);
-                }
-            }));
-            this.taskList.Add(task);
+            //this.MemValues.Clear();
+            //for (int i = 0; i < 40; i++)
+            //{
+            //    this.MemValues.Add(new ObservableValue(0.0f));
+            //}
+            //var task = Task.Factory.StartNew(new Action(async () =>
+            //{
+            //    while (taskSwitch)
+            //    {
+            //        this.CurrentMem = random.Next((int)Math.Max(this.CurrentMem - 5, 0), (int)(this.CurrentMem + 5));
+            //        await Task.Delay(1000);
+            //    }
+            //}));
+            //this.taskList.Add(task);
         }
         public void Dispose()
         {
             try
             {
-                this.taskSwitch = false;
+                //this.taskSwitch = false;
                 Task.WaitAll(this.taskList.ToArray());
                 ComputerInfo.GetInstance().Dispose();
             }

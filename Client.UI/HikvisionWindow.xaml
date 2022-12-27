@@ -20,7 +20,7 @@
         <WindowChrome CaptionHeight="0" ResizeBorderThickness="20"/>
     </WindowChrome.WindowChrome>
     <Window.Resources>
-        <common:ParameterConvert x:Key="ParameterConvert"></common:ParameterConvert>
+        
         <Style TargetType="DataGrid">
             <Setter Property="RowHeaderWidth" Value="25"></Setter>
             <Setter Property="AutoGenerateColumns" Value="False"></Setter>
