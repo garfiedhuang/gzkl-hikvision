@@ -13,14 +13,14 @@ namespace GZKL.Client.UI
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class HikvisionWindow : Window
     {
-        public MainWindow(LoginSuccessModel loginSuccessModel)
+        public HikvisionWindow(LoginSuccessModel loginSuccessModel)
         {
             InitializeComponent();
 
             this.DataContext = new MainViewModel(loginSuccessModel);
-
+            /*
             Messenger.Default.Register<string>(this, "ExpandMenu", arg =>
             {
                 if (this.menu.Width < 200)
@@ -38,7 +38,7 @@ namespace GZKL.Client.UI
                 var template = this.IC.ItemTemplateSelector;
                 this.IC.ItemTemplateSelector = null;
                 this.IC.ItemTemplateSelector = template;              
-            });
+            });*/
         }
 
         private void Border_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -69,6 +69,66 @@ namespace GZKL.Client.UI
             Grid gridtemp = (Grid) btn.Template.FindName("gridtemp",btn);
             Popup menuPop = (Popup)gridtemp.FindName("menuPop");
             menuPop.IsOpen = true;
+        }
+
+        private void btnDeviceManagement_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void btnCheckTime_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void btnRegister_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void btnExit_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void btnStartPlay_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void btnStopPlay_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void btnDownload_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void btnPausePlay_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void btnRecoverPlay_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void btnFastPlay_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void btnSlowPlay_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void btnQuery_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

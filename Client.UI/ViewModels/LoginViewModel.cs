@@ -89,24 +89,24 @@ namespace GZKL.Client.UI.ViewsModels
 
             try
             {
-                //执行登录
-                loginResult = DbLogin();
+                ////执行登录
+                //loginResult = DbLogin();
 
-                //保存登录设置
-                this.SaveLoginSetting(new LoginModel()
-                {
-                    AutoLogin = autoLogin,
-                    RememberPassword = rememberPassword,
-                    UserName = userName,
-                    Password = password
-                });
+                ////保存登录设置
+                //this.SaveLoginSetting(new LoginModel()
+                //{
+                //    AutoLogin = autoLogin,
+                //    RememberPassword = rememberPassword,
+                //    UserName = userName,
+                //    Password = password
+                //});
 
-                var mainWindow = new MainWindow(loginResult);
+                var mainWindow = new HikvisionWindow(loginResult);
 
                 //关闭登录窗口
                 (o as System.Windows.Window).Close();
 
-                if (loginResult.User?.Id > 0)
+                //if (loginResult.User?.Id > 0)
                 {
                     //开启主画面
                     var result = mainWindow.ShowDialog();

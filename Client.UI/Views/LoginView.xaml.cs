@@ -23,7 +23,7 @@ namespace GZKL.Client.UI.Views
 
             this.Unloaded += (sender, e) => Messenger.Default.Unregister(this);
 
-
+            /*
             var viewModel = this.DataContext as LoginViewModel;
             var loginModel = viewModel.GetLoginSetting();
 
@@ -57,6 +57,7 @@ namespace GZKL.Client.UI.Views
                     timer.Start();
                 });
             }
+            */
         }
 
         private void UserNameErrorToken(string msg)
