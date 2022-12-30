@@ -199,7 +199,7 @@ namespace GZKL.Client.UI.ViewsModels
             {
                 SessionInfo.Instance.UserInfo = loginSuccessModel.User;
 
-                GetMenuData(loginSuccessModel.Menus);//“Ï≤Ω
+                //GetMenuData(loginSuccessModel.Menus);//“Ï≤Ω
 
                 GetPCAndRegisterData();//“Ï≤Ω
 

@@ -1,25 +1,22 @@
-﻿using GalaSoft.MvvmLight.Messaging;
-using GZKL.Client.UI.Common;
-using GZKL.Client.UI.ViewsModels;
+﻿using GZKL.Client.UI.ViewsModels;
 using GZKL.Client.UI.Models;
-using System;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Controls.Primitives;
 using GZKL.Client.UI.Views.SystemMgt.Device;
-using HandyControl.Tools.Extension;
 
 namespace GZKL.Client.UI
 {
     /// <summary>
-    /// MainWindow.xaml 的交互逻辑
+    /// Hikvision.xaml 的交互逻辑
     /// </summary>
-    public partial class HikvisionWindow : Window
+    public partial class Hikvision : Window
     {
-        public HikvisionWindow(LoginSuccessModel loginSuccessModel)
+        public Hikvision(LoginSuccessModel loginSuccessModel)
         {
             InitializeComponent();
+
+            //this.txtTitle.Title = $"XXXXXX系统({GetEdition()})";
+            
 
             this.DataContext = new HikvisionViewModel(loginSuccessModel);
             /*
@@ -41,6 +38,11 @@ namespace GZKL.Client.UI
                 this.IC.ItemTemplateSelector = null;
                 this.IC.ItemTemplateSelector = template;              
             });*/
+        }
+
+        public static string GetEdition()
+        {
+            return Application.ResourceAssembly.GetName().Version.ToString();
         }
 
         private void Border_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

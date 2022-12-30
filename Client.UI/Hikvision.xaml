@@ -1,4 +1,4 @@
-﻿<Window x:Class="GZKL.Client.UI.HikvisionWindow"
+﻿<Window x:Class="GZKL.Client.UI.Hikvision"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -6,11 +6,10 @@
         xmlns:hc="https://handyorg.github.io/handycontrol"
         xmlns:common="clr-namespace:GZKL.Client.UI.Common"
         mc:Ignorable="d"
-        Title="XXXXXX系统"
         Height="800"
         Width="1400" 
         FontFamily="Microsoft Yahei"
-        x:Name="frmHikvisionWindow"
+        x:Name="frmHikvision"
         ResizeMode="CanResize"
         WindowStartupLocation="CenterScreen"
         WindowStyle="None" 
@@ -83,8 +82,8 @@
                                                     <WrapPanel>
                                                         <Image Source="/Assets/Images/icon.ico" Width="25" Height="25" />
 
-                                                        <TextBlock FontSize="18" 
-                                                                   Text="XXXXXX系统" 
+                                                        <TextBlock x:Name="txtTitle" 
+                                                                   FontSize="18" 
                                                                    Foreground="#5a5e66" 
                                                                    Margin="5 0 0 0" 
                                                                    HorizontalAlignment="Right" 
@@ -122,14 +121,12 @@
                 <Grid x:Name="gdThird" Grid.Column="0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"></RowDefinition>
-                        <!--<RowDefinition Height="20"></RowDefinition>-->
                     </Grid.RowDefinitions>
                     <hc:SimplePanel Grid.Row="0" Background="Black">
 
                         <ProgressBar Height="20" Value="77.78" Margin="0" VerticalAlignment="Bottom"/>
-                        <!--<hc:SimplePanel Height="20" Background="Blue" VerticalAlignment="Bottom" ></hc:SimplePanel>-->
+                        
                     </hc:SimplePanel>
-                    <!--<hc:SimplePanel Grid.Row="1" Background="Blue" ></hc:SimplePanel>-->
                 </Grid>
                 <Grid x:Name="gdFour" Grid.Column="1">
                     <Grid.RowDefinitions>

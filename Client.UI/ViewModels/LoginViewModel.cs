@@ -99,7 +99,7 @@ namespace GZKL.Client.UI.ViewsModels
                     Password = password
                 });
 
-                var mainWindow = new HikvisionWindow(loginResult);
+                var mainWindow = new Hikvision(loginResult);
 
                 //关闭登录窗口
                 (o as System.Windows.Window).Close();
