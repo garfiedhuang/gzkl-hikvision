@@ -23,7 +23,6 @@ namespace GZKL.Client.UI.Views
 
             this.Unloaded += (sender, e) => Messenger.Default.Unregister(this);
 
-            /*
             var viewModel = this.DataContext as LoginViewModel;
             var loginModel = viewModel.GetLoginSetting();
 
@@ -57,13 +56,13 @@ namespace GZKL.Client.UI.Views
                     timer.Start();
                 });
             }
-            */
         }
 
         private void UserNameErrorToken(string msg)
-        {  
-            ////this.UserNameStr.IsError = true;
-            ////this.UserNameStr.ErrorStr = msg;
+        {
+            this.UserNameStr.IsError = true;
+            this.UserNameStr.ErrorStr = msg;
+
         }
 
         private void LoginWindow_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

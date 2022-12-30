@@ -7,23 +7,28 @@ using System.Data.SqlClient;
 using System.Data;
 using System.Net;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace GZKL.Client.UI.ViewsModels
 {
     public class LoginViewModel : ViewModelBase
     {
+        /// <summary>
+        /// Access数据库本地路径
+        /// </summary>
+        private readonly string _dbPath= Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"Database", "JCDVRRecord.mdb");
 
         public LoginViewModel()
         {
-            //var loginModel = GetLoginSetting();
-            //if (loginModel.RememberPassword)
-            //{
-            //    UserName= loginModel.UserName;
-            //    Password= loginModel.Password;
-            //}
+            var loginModel = GetLoginSetting();
+            if (loginModel.RememberPassword)
+            {
+                UserName = loginModel.UserName;
+                Password = loginModel.Password;
+            }
 
-            //this.AutoLogin = loginModel.AutoLogin;
-            //this.RememberPassword = loginModel.RememberPassword;
+            this.AutoLogin = loginModel.AutoLogin;
+            this.RememberPassword = loginModel.RememberPassword;
         }
 
         #region =====Data
@@ -89,17 +94,17 @@ namespace GZKL.Client.UI.ViewsModels
 
             try
             {
-                ////执行登录
-                //loginResult = DbLogin();
+                //执行登录
+                loginResult = DbLogin();
 
-                ////保存登录设置
-                //this.SaveLoginSetting(new LoginModel()
-                //{
-                //    AutoLogin = autoLogin,
-                //    RememberPassword = rememberPassword,
-                //    UserName = userName,
-                //    Password = password
-                //});
+                //保存登录设置
+                this.SaveLoginSetting(new LoginModel()
+                {
+                    AutoLogin = autoLogin,
+                    RememberPassword = rememberPassword,
+                    UserName = userName,
+                    Password = password
+                });
 
                 var mainWindow = new HikvisionWindow(loginResult);
 
@@ -127,10 +132,9 @@ namespace GZKL.Client.UI.ViewsModels
             var result = new LoginSuccessModel();
 
             //用户
-            var sql = @"SELECT TOP 1 * FROM [sys_user] WHERE [is_deleted]=0 AND [name]=@userName AND [password]=@password";
-            var parameters = new SqlParameter[] { new SqlParameter("@userName", userName), new SqlParameter("@password", Password) };
+            var sql = $"SELECT * FROM [sys_user] WHERE [is_deleted]=0 AND [name]={userName} AND [password]={Password}";
 
-            using (var dt = SQLHelper.GetDataTable(sql, parameters))
+            using (var dt = OleDbHelper.DataTable(sql, _dbPath))
             {
                 if (dt != null && dt.Rows.Count > 0)
                 {
@@ -140,11 +144,11 @@ namespace GZKL.Client.UI.ViewsModels
                     {
                         Id = Convert.ToInt64(dataRow["id"]),
                         Name = dataRow["name"].ToString(),
-                        Email = dataRow["email"].ToString(),
-                        Phone = dataRow["phone"].ToString(),
-                        HeadImg = dataRow["head_img"].ToString(),
-                        Sex = Convert.ToInt32(dataRow["sex"]),
-                        Birthday = Convert.ToDateTime(dataRow["birthday"] ?? DateTime.MinValue),
+                        //Email = dataRow["email"].ToString(),
+                        //Phone = dataRow["phone"].ToString(),
+                        //HeadImg = dataRow["head_img"].ToString(),
+                        //Sex = Convert.ToInt32(dataRow["sex"]),
+                        //Birthday = Convert.ToDateTime(dataRow["birthday"] ?? DateTime.MinValue),
                         IsEnabled = Convert.ToInt32(dataRow["is_enabled"]),
                         CreateDt = Convert.ToDateTime(dataRow["create_dt"]),
                         UpdateDt = Convert.ToDateTime(dataRow["update_dt"]),
@@ -231,10 +235,9 @@ namespace GZKL.Client.UI.ViewsModels
             var result = new LoginModel();
             var hostName = Dns.GetHostName().ToUpper();
 
-            var sql = @"SELECT * FROM [sys_config] WHERE [category]=@category AND [is_deleted]=0";
-            var parameters = new SqlParameter[] { new SqlParameter("@category", hostName) };
+            var sql = $"SELECT * FROM [sys_config] WHERE [category]={hostName} AND [is_deleted]=0";
 
-            using (var dt = SQLHelper.GetDataTable(sql, parameters))
+            using (var dt = OleDbHelper.DataTable(sql, _dbPath))
             {
                 foreach (DataRow dr in dt?.Rows)
                 {
@@ -334,7 +337,7 @@ namespace GZKL.Client.UI.ViewsModels
 	  END
 END";
 
-                var result = SQLHelper.ExecuteNonQuery(sql);
+                OleDbHelper.ExcuteSql(sql,_dbPath);
             });
         }
     }
