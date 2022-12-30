@@ -8,6 +8,7 @@ using System.Data;
 using System.Net;
 using System.Threading.Tasks;
 using System.IO;
+using System.Reflection;
 
 namespace GZKL.Client.UI.ViewsModels
 {
@@ -20,15 +21,7 @@ namespace GZKL.Client.UI.ViewsModels
 
         public LoginViewModel()
         {
-            var loginModel = GetLoginSetting();
-            if (loginModel.RememberPassword)
-            {
-                UserName = loginModel.UserName;
-                Password = loginModel.Password;
-            }
 
-            this.AutoLogin = loginModel.AutoLogin;
-            this.RememberPassword = loginModel.RememberPassword;
         }
 
         #region =====Data
@@ -111,7 +104,7 @@ namespace GZKL.Client.UI.ViewsModels
                 //关闭登录窗口
                 (o as System.Windows.Window).Close();
 
-                //if (loginResult.User?.Id > 0)
+                if (loginResult.User?.Id > 0)
                 {
                     //开启主画面
                     var result = mainWindow.ShowDialog();
@@ -132,7 +125,7 @@ namespace GZKL.Client.UI.ViewsModels
             var result = new LoginSuccessModel();
 
             //用户
-            var sql = $"SELECT * FROM [sys_user] WHERE [is_deleted]=0 AND [name]={userName} AND [password]={Password}";
+            var sql = $"SELECT * FROM [sys_user] WHERE [is_deleted]=0 AND [name]='{userName}' AND [password]='{Password}'";
 
             using (var dt = OleDbHelper.DataTable(sql, _dbPath))
             {
@@ -235,7 +228,7 @@ namespace GZKL.Client.UI.ViewsModels
             var result = new LoginModel();
             var hostName = Dns.GetHostName().ToUpper();
 
-            var sql = $"SELECT * FROM [sys_config] WHERE [category]={hostName} AND [is_deleted]=0";
+            var sql = $"SELECT * FROM [sys_config] WHERE [category]='{hostName}' AND [is_deleted]=0";
 
             using (var dt = OleDbHelper.DataTable(sql, _dbPath))
             {
@@ -273,71 +266,42 @@ namespace GZKL.Client.UI.ViewsModels
             {
                 var hostName = Dns.GetHostName().ToUpper();
 
-                var sql = $@"BEGIN
-   DECLARE @iRC INT;
-   SELECT @iRC=COUNT(1) FROM [sys_config] WHERE [category]='{hostName}' AND [value]='UserName' AND [is_deleted]=0;
+                var querySql = string.Empty;
+                var insertSql = string.Empty;
+                var updateSql = string.Empty;
 
-   IF @iRC=0
-      BEGIN
-	  INSERT INTO [dbo].[sys_config]
-           ([category],[value],[text],[remark]
-           ,[is_enabled],[is_deleted],[create_dt],[create_user_id],[update_dt],[update_user_id])
-      VALUES
-           ('{hostName}','UserName','{loginModel.UserName}','登录设置，用户名'
-           ,1,0,getdate(),1,getdate(),1)
-	  END
-	ELSE
-	  BEGIN
-	  UPDATE [dbo].[sys_config] SET [text]='{loginModel.UserName}',[update_dt]=GETDATE() WHERE  [category]='{hostName}' AND [value]='UserName' AND [is_deleted]=0;
-	  END
+                var propertyInfos = loginModel.GetType().GetProperties(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
 
-   SELECT @iRC=COUNT(1) FROM [sys_config] WHERE [category]='{hostName}' AND [value]='Password' AND [is_deleted]=0;
-   IF @iRC=0
-      BEGIN
-	  INSERT INTO [dbo].[sys_config]
-           ([category],[value],[text],[remark]
-           ,[is_enabled],[is_deleted],[create_dt],[create_user_id],[update_dt],[update_user_id])
-      VALUES
-           ('{hostName}','Password','{loginModel.Password}','登录设置，用户密码'
-           ,1,0,getdate(),1,getdate(),1)
-	  END
-	ELSE
-	  BEGIN
-	  UPDATE [dbo].[sys_config] SET [text]='{loginModel.Password}',[update_dt]=GETDATE() WHERE  [category]='{hostName}' AND [value]='Password' AND [is_deleted]=0;
-	  END
+                try
+                {
+                    foreach (var property in propertyInfos)
+                    {
 
-   SELECT @iRC=COUNT(1) FROM [sys_config] WHERE [category]='{hostName}' AND [value]='AutoLogin' AND [is_deleted]=0;
-   IF @iRC=0
-      BEGIN
-	  INSERT INTO [dbo].[sys_config]
-           ([category],[value],[text],[remark]
-           ,[is_enabled],[is_deleted],[create_dt],[create_user_id],[update_dt],[update_user_id])
-      VALUES
-           ('{hostName}','AutoLogin','{loginModel.AutoLogin}','登录设置，是否自动登录'
-           ,1,0,getdate(),1,getdate(),1)
-	  END
-	ELSE
-	  BEGIN
-	  UPDATE [dbo].[sys_config] SET [text]='{loginModel.AutoLogin}',[update_dt]=GETDATE() WHERE  [category]='{hostName}' AND [value]='AutoLogin' AND [is_deleted]=0;
-	  END
+                        querySql = $"SELECT COUNT(1) FROM [sys_config] WHERE [category]='{hostName}' AND [value]='{property.Name}' AND [is_deleted]=0";
 
-   SELECT @iRC=COUNT(1) FROM [sys_config] WHERE [category]='{hostName}' AND [value]='RememberPassword' AND [is_deleted]=0;
-   IF @iRC=0
-      BEGIN
-	  INSERT INTO [dbo].[sys_config]
-           ([category],[value],[text],[remark]
-           ,[is_enabled],[is_deleted],[create_dt],[create_user_id],[update_dt],[update_user_id])
-      VALUES
-           ('{hostName}','RememberPassword','{loginModel.RememberPassword}','登录设置，是否记住密码'
-           ,1,0,getdate(),1,getdate(),1)
-	  END
-	ELSE
-	  BEGIN
-	  UPDATE [dbo].[sys_config] SET [text]='{loginModel.RememberPassword}',[update_dt]=GETDATE() WHERE  [category]='{hostName}' AND [value]='RememberPassword' AND [is_deleted]=0;
-	  END
-END";
+                        insertSql = $@"INSERT INTO [sys_config]([category],[value],[text],[remark],[is_deleted],[create_dt],[create_user_id],[update_dt],[update_user_id]) VALUES('{hostName}','{property.Name}','{property.GetValue(loginModel, null)}','登录设置',0,Now(),1,Now(),1)";
 
-                OleDbHelper.ExcuteSql(sql,_dbPath);
+                        updateSql = $@"UPDATE [sys_config] SET [text]='{property.GetValue(loginModel, null)}',[update_dt]=Date() WHERE [category]='{hostName}' AND [value]='UserName' AND [is_deleted]=0";
+
+                        var effectRows = Convert.ToInt32(OleDbHelper.ExecuteScalar(querySql, _dbPath));
+
+                        if (effectRows == 0)
+                        {
+                            OleDbHelper.ExcuteSql(insertSql, _dbPath);
+                        }
+                        else
+                        {
+                            OleDbHelper.ExcuteSql(updateSql, _dbPath);
+                        }
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.Error($"保存登录配置失败，{ex?.Message}");
+                }
+
+
             });
         }
     }

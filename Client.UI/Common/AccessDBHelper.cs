@@ -129,6 +129,33 @@ namespace GZKL.Client.UI.Common
             }
         }
 
+
+        /// <summary>
+        /// 返回指定sql语句的object对象，使用时请注意关闭这个对象。
+        /// </summary>
+        /// <param name="sqlstr"></param>
+        /// <returns></returns>
+        public static object ExecuteScalar(string sqlstr, string path)
+        {
+            object obj = null;
+            try
+            {
+                OpenConnection(path);
+                comm.CommandText = sqlstr;
+                comm.CommandType = CommandType.Text;
+                obj = comm.ExecuteScalar();
+            }
+            catch
+            {
+                try
+                {
+                    CloseConnection();
+                }
+                catch { }
+            }
+            return obj;
+        }
+
         /// <summary>
         /// 返回指定sql语句的dataset
         /// </summary>
