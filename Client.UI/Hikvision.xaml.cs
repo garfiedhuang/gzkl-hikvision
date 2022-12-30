@@ -21,7 +21,7 @@ namespace GZKL.Client.UI
         {
             InitializeComponent();
 
-            this.DataContext = new MainViewModel(loginSuccessModel);
+            this.DataContext = new HikvisionViewModel(loginSuccessModel);
             /*
             Messenger.Default.Register<string>(this, "ExpandMenu", arg =>
             {

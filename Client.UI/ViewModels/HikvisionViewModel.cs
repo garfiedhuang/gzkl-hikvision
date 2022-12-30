@@ -13,30 +13,30 @@ using System.Windows;
 
 namespace GZKL.Client.UI.ViewsModels
 {
-    public class MainViewModel : ViewModelBase
+    public class HikvisionViewModel : ViewModelBase
     {
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="loginSuccessModel"></param>
-        public MainViewModel(LoginSuccessModel loginSuccessModel)
+        public HikvisionViewModel(LoginSuccessModel loginSuccessModel)
         {
-            ModuleGroups = new ObservableCollection<ModuleGroupModel>();
-            TabModels = new ObservableCollection<MenuTabModel>();
+            //ModuleGroups = new ObservableCollection<ModuleGroupModel>();
+            //TabModels = new ObservableCollection<MenuTabModel>();
 
-            ChangeContentCommand = new RelayCommand<object>(NavChanged);
-            ExpandMenuCommand = new RelayCommand(() =>
-            {
-                for (int i = 0; i < ModuleGroups.Count; i++)
-                {
-                    var item = ModuleGroups[i];
-                    item.ContractionTemplate = !item.ContractionTemplate;
-                }
-                Messenger.Default.Send("", "ExpandMenu");
-            });
+            //ChangeContentCommand = new RelayCommand<object>(NavChanged);
+            //ExpandMenuCommand = new RelayCommand(() =>
+            //{
+            //    for (int i = 0; i < ModuleGroups.Count; i++)
+            //    {
+            //        var item = ModuleGroups[i];
+            //        item.ContractionTemplate = !item.ContractionTemplate;
+            //    }
+            //    Messenger.Default.Send("", "ExpandMenu");
+            //});
 
-            //默认展开首页
-            NavChanged("Home");
+            ////默认展开首页
+            //NavChanged("Home");
 
             //初始化数据
             InitData(loginSuccessModel);

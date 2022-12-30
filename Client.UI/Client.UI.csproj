@@ -105,8 +105,8 @@
     <Compile Include="Common\Win32Helper.cs" />
     <Compile Include="Converters\CheckConverter.cs" />
     <Compile Include="Converters\EnumConverter.cs" />
-    <Compile Include="HikvisionWindow.xaml.cs">
-      <DependentUpon>HikvisionWindow.xaml</DependentUpon>
+    <Compile Include="Hikvision.xaml.cs">
+      <DependentUpon>Hikvision.xaml</DependentUpon>
     </Compile>
     <Compile Include="Models\LoginModel.cs" />
     <Compile Include="Models\MenuModel.cs" />
@@ -123,7 +123,7 @@
     <Compile Include="Models\UserModel.cs" />
     <Compile Include="ViewModels\HomeViewModel.cs" />
     <Compile Include="ViewModels\LoginViewModel.cs" />
-    <Compile Include="ViewModels\MainViewModel.cs" />
+    <Compile Include="ViewModels\HikvisionViewModel.cs" />
     <Compile Include="ViewModels\ConfigViewModel.cs" />
     <Compile Include="ViewModels\RegisterViewModel.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />
@@ -147,7 +147,7 @@
       <SubType>Designer</SubType>
       <Generator>XamlIntelliSenseFileGenerator</Generator>
     </Page>
-    <Page Include="HikvisionWindow.xaml">
+    <Page Include="Hikvision.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

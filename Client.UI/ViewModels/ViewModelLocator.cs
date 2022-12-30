@@ -13,7 +13,7 @@ namespace GZKL.Client.UI.ViewsModels
         public ViewModelLocator()
         {
             ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
-            SimpleIoc.Default.Register<MainViewModel>();
+            SimpleIoc.Default.Register<HikvisionViewModel>();
             SimpleIoc.Default.Register<LoginViewModel>();
             SimpleIoc.Default.Register<HomeViewModel>();
             SimpleIoc.Default.Register<ConfigViewModel>();
@@ -23,7 +23,7 @@ namespace GZKL.Client.UI.ViewsModels
         public static ViewModelLocator Instance = new Lazy<ViewModelLocator>(() =>
            Application.Current.TryFindResource("Locator") as ViewModelLocator).Value;
 
-        public MainViewModel Main => SimpleIoc.Default.GetInstance<MainViewModel>();
+        public HikvisionViewModel Main => SimpleIoc.Default.GetInstance<HikvisionViewModel>();
         public LoginViewModel Login => ServiceLocator.Current.GetInstance<LoginViewModel>();
         public HomeViewModel Home => ServiceLocator.Current.GetInstance<HomeViewModel>();
 
