@@ -108,20 +108,17 @@
     <Compile Include="HikvisionWindow.xaml.cs">
       <DependentUpon>HikvisionWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Models\LoginModel.cs" />
     <Compile Include="Models\MenuModel.cs" />
     <Compile Include="Models\ModuleModel.cs" />
     <Compile Include="Models\ModuleGroupModel.cs" />
     <Compile Include="Models\MenuTabModel.cs" />
     <Compile Include="Models\ConfigModel.cs" />
-    <Compile Include="CustomControls\Attach\IconElement.cs" />
-    <Compile Include="CustomControls\Views\MeterPlate.xaml.cs">
+    <Compile Include="CustomViews\Attach\IconElement.cs" />
+    <Compile Include="CustomViews\Views\MeterPlate.xaml.cs">
       <DependentUpon>MeterPlate.xaml</DependentUpon>
     </Compile>
-    <Compile Include="CustomControls\Template\MenuTemplateSelector.cs" />
+    <Compile Include="CustomViews\Template\MenuTemplateSelector.cs" />
     <Compile Include="Models\RegisterModel.cs" />
     <Compile Include="Models\UserModel.cs" />
     <Compile Include="ViewModels\HomeViewModel.cs" />
@@ -130,9 +127,6 @@
     <Compile Include="ViewModels\ConfigViewModel.cs" />
     <Compile Include="ViewModels\RegisterViewModel.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />
-    <Compile Include="Views\Home.xaml.cs">
-      <DependentUpon>Home.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\LoginView.xaml.cs">
       <DependentUpon>LoginView.xaml</DependentUpon>
     </Compile>
@@ -157,15 +151,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="MainWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CustomControls\Views\MeterPlate.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Home.xaml">
+    <Page Include="CustomViews\Views\MeterPlate.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
