@@ -281,7 +281,7 @@ namespace GZKL.Client.UI.ViewsModels
 
                         insertSql = $@"INSERT INTO [sys_config]([category],[value],[text],[remark],[is_deleted],[create_dt],[create_user_id],[update_dt],[update_user_id]) VALUES('{hostName}','{property.Name}','{property.GetValue(loginModel, null)}','登录设置',0,Now(),1,Now(),1)";
 
-                        updateSql = $@"UPDATE [sys_config] SET [text]='{property.GetValue(loginModel, null)}',[update_dt]=Date() WHERE [category]='{hostName}' AND [value]='UserName' AND [is_deleted]=0";
+                        updateSql = $@"UPDATE [sys_config] SET [text]='{property.GetValue(loginModel, null)}',[update_dt]=Now() WHERE [category]='{hostName}' AND [value]='{property.Name}' AND [is_deleted]=0";
 
                         var effectRows = Convert.ToInt32(OleDbHelper.ExecuteScalar(querySql, _dbPath));
 
