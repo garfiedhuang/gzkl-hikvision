@@ -129,8 +129,8 @@
                 </GroupBox>
                 
                 <WrapPanel HorizontalAlignment="Right" VerticalAlignment="Center">
-                    <Button x:Name="btnQuery" Content="新增设备" Width="100" Margin="0,5,10,0" hc:BorderElement.CornerRadius="5"/>
-                    <Button x:Name="btnSave" Content="清空设置" Width="100" Margin="0,5,12,0" hc:BorderElement.CornerRadius="5"/>
+                    <Button x:Name="btnAdd" Content="新增设备" Command="{Binding AddDeviceCmd}" Width="100" Margin="0,5,10,0" hc:BorderElement.CornerRadius="5"/>
+                    <Button x:Name="btnReset" Content="清空设置" Command="{Binding ResetDeviceCmd}" Width="100" Margin="0,5,12,0" hc:BorderElement.CornerRadius="5"/>
                     <!--<Button x:Name="btnRefresh" Content="退出" Width="100" Margin="10,5,10,0" hc:BorderElement.CornerRadius="5"/>-->
                 </WrapPanel>
             </StackPanel>
@@ -147,8 +147,8 @@
 
                         <DataGrid Margin="5" 
                                           Background="White"
-                                          x:Name="dgDvrData"
-                                          ItemsSource="{Binding Model.DvrData}" >
+                                          x:Name="dgNvrData"
+                                          ItemsSource="{Binding Model.NvrData}" >
 
                             <DataGrid.Columns>
                                 <DataGridTextColumn IsReadOnly="True" MinWidth="60" Binding="{Binding Id}" Header="ID"/>
@@ -163,8 +163,8 @@
 
                         <DataGrid Margin="5" 
                                           Background="White"
-                                          x:Name="dgNvrData" 
-                                          ItemsSource="{Binding Model.NvrData}" >
+                                          x:Name="dgDvrData" 
+                                          ItemsSource="{Binding Model.DvrData}" >
 
                             <DataGrid.Columns>
                                 <DataGridTextColumn IsReadOnly="True" MinWidth="60" Binding="{Binding Id}" Header="ID"/>

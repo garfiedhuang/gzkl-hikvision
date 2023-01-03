@@ -69,7 +69,7 @@ namespace GZKL.Client.UI.Views.SystemMgt.Device
         {
             try
             {
-                this.btnQuery.IsEnabled = false;
+                
 
                 //var viewModel = this.DataContext as AutoCollectViewModel;
 

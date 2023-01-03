@@ -46,4 +46,29 @@ namespace GZKL.Client.UI.Models
         public string Password { get { return password; } set { password = value; RaisePropertyChanged(); } }
 
     }
+
+    /// <summary>
+    /// NVR
+    /// </summary>
+    public class NvrData
+    {
+        public int ID { get; set; }
+        public string DeviceName { get; set; }
+        public string DeviceIp { get; set; }
+        public int DevicePort { get; set; }
+        public string UserName { get; set; }
+        public string Password { get; set; }
+    }
+
+    /// <summary>
+    /// DVR
+    /// </summary>
+    public class DvrData
+    {
+        public int ID { get; set; }
+        public string DeviceName { get; set; }
+        public string DeviceIp { get; set; }
+        public int DeviceChannelNo { get; set; }
+        public int NVRID { get; set; }
+    }
 }

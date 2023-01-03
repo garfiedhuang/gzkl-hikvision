@@ -90,8 +90,10 @@
     <Compile Include="API\MenuApi.cs" />
     <Compile Include="Common\AccessDbHelper.cs" />
     <Compile Include="Common\AnimationHelper.cs" />
+    <Compile Include="Common\CHCNetSDK.cs" />
     <Compile Include="Common\CollectionHelper.cs" />
     <Compile Include="Common\DsnHelper.cs" />
+    <Compile Include="Common\HikvisionHelper.cs" />
     <Compile Include="Common\LogHelper.cs" />
     <Compile Include="Common\RegisterInfo.cs" />
     <Compile Include="Common\SecurityHelper.cs" />
@@ -188,6 +190,15 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <Resource Include="Fonts\Small\iconfont.ttf" />
+    <None Include="HCNetSDKCom\HCAlarm.lib">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="HCNetSDKCom\HCGeneralCfgMgr.lib">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="HCNetSDKCom\HCPreview.lib">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="NLog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -220,6 +231,54 @@
   <ItemGroup>
     <Content Include="Assets\Scripts\sha.js" />
     <Content Include="Database\JCDVRRecord.mdb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HCNetSDKCom\AnalyzeData.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HCNetSDKCom\AudioIntercom.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HCNetSDKCom\AudioRender.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HCNetSDKCom\HCAlarm.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HCNetSDKCom\HCCoreDevCfg.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HCNetSDKCom\HCDisplay.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HCNetSDKCom\HCGeneralCfgMgr.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HCNetSDKCom\HCIndustry.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HCNetSDKCom\HCPlayBack.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HCNetSDKCom\HCPreview.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HCNetSDKCom\HCVoiceTalk.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HCNetSDKCom\libiconv2.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HCNetSDKCom\msvcr90.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HCNetSDKCom\OpenAL32.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HCNetSDKCom\StreamTransClient.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HCNetSDKCom\SystemTransform.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
