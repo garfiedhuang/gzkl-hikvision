@@ -7,7 +7,9 @@
              xmlns:converter="clr-namespace:GZKL.Client.UI.Converters"
              xmlns:bi="clr-namespace:GZKL.Client.UI.CustomControls.Attach"
              xmlns:wms="clr-namespace:WpfMultiStyle;assembly=WpfMultiStyle"
+             xmlns:cv="clr-namespace:GZKL.Client.UI.Converters"
              xmlns:hc="https://handyorg.github.io/handycontrol"
+             DataContext="{Binding Source={StaticResource Locator},Path=Device}"
              mc:Ignorable="d"
              Title="设备管理"
              ResizeMode="NoResize"
@@ -52,6 +54,9 @@
             <Setter Property="TextAlignment" Value="Center"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
+
+        <cv:CheckConverter x:Key="checkConverter"/>
+        
     </Window.Resources>
 
     <Grid Background="White">
@@ -67,16 +72,14 @@
 
             <StackPanel Grid.Row="0">
                 <GroupBox x:Name="gbSampleInfo" Height="100"  Header="" Style="{StaticResource GroupBoxOriginal}" HorizontalContentAlignment="Left">
-
-
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="15*"></ColumnDefinition>
                             <ColumnDefinition Width="85*"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
                         <WrapPanel Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center">
-                            <RadioButton Margin="8" Content="录像机" IsChecked="True" Background="{DynamicResource PrimaryBrush}" Foreground="{DynamicResource PrimaryTextBrush}"/>
-                            <RadioButton Margin="8" Content="摄像机" Background="{DynamicResource PrimaryBrush}" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                            <RadioButton Margin="8" Content="录像机" GroupName="deviceType" Command="{Binding RbSelectedChangedCmd}" IsChecked="{Binding Model.DeviceType,Mode=TwoWay,Converter={StaticResource checkConverter},ConverterParameter=VR}" Background="{DynamicResource PrimaryBrush}" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                            <RadioButton Margin="8" Content="摄像机" GroupName="deviceType" Command="{Binding RbSelectedChangedCmd}" IsChecked="{Binding Model.DeviceType,Mode=TwoWay,Converter={StaticResource checkConverter},ConverterParameter=VC}" Background="{DynamicResource PrimaryBrush}" Foreground="{DynamicResource PrimaryTextBrush}"/>
                         </WrapPanel>
 
                         <WrapPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center">
@@ -101,7 +104,7 @@
                             hc:TitleElement.TitlePlacement="Left"
                             hc:InfoElement.Placeholder="请输入设备端口" 
                             Text="{Binding Model.DevicePortOrChannelNo,Mode=TwoWay}"
-                            hc:InfoElement.Title="设备端口："
+                            hc:InfoElement.Title="{Binding DevicePortOrChannelNoContent}"
                             hc:InfoElement.Necessary="False"/>
 
                             <hc:TextBox Margin="2" Width="250"
@@ -109,6 +112,7 @@
                             hc:TitleElement.TitlePlacement="Left"
                             hc:InfoElement.Placeholder="请输入用户名" 
                             Text="{Binding Model.UserName,Mode=TwoWay}"
+                            Visibility="{Binding UserNameAndPasswordVisable}"
                             hc:InfoElement.Title="用户名："
                             hc:InfoElement.Necessary="False"/>
 
@@ -117,6 +121,7 @@
                             hc:TitleElement.TitlePlacement="Left"
                             hc:InfoElement.Placeholder="请输入密码" 
                             Text="{Binding Model.Password,Mode=TwoWay}"
+                            Visibility="{Binding UserNameAndPasswordVisable}"
                             hc:InfoElement.Title="密码："
                             hc:InfoElement.Necessary="False"/>
                         </WrapPanel>

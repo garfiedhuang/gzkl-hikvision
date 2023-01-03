@@ -8,6 +8,7 @@ namespace GZKL.Client.UI.API
 {
     public class MenuApi
     {
+        /*
         /// <summary>
         /// 获取模块分组集合
         /// </summary>
@@ -200,5 +201,7 @@ namespace GZKL.Client.UI.API
             }
             return list;
         }
+
+        */
     }
 }

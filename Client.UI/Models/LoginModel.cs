@@ -34,7 +34,6 @@ namespace GZKL.Client.UI.Models
         public UserModel User { get; set; }
 
         //public RoleModel Role { get; set; }
-
-        public List<MenuModel> Menus { get; set; }
+        //public List<MenuModel> Menus { get; set; }
     }
 }

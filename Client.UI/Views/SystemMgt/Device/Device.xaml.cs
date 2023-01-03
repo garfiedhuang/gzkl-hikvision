@@ -106,6 +106,5 @@ namespace GZKL.Client.UI.Views.SystemMgt.Device
                 MessageBox.Show(ex.Message, "操作提示");
             }
         }
-
     }
 }

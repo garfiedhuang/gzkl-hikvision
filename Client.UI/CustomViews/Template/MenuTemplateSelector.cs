@@ -11,6 +11,7 @@ namespace GZKL.Client.UI.CustomControls.Template
 {
     public class MenuTemplateSelector: DataTemplateSelector
     {
+        /*
         public DataTemplate GroupTemplate { get; set; }
         public DataTemplate ExpanderTemplate { get; set; }
 
@@ -26,5 +27,6 @@ namespace GZKL.Client.UI.CustomControls.Template
             }
             return ExpanderTemplate;
         }
+        */
     }
 }
