@@ -150,7 +150,7 @@ namespace GZKL.Client.UI.ViewsModels
             }
             else
             {
-                msg = Model.DeviceType == "VR" ? AddNvr() : AddDvr();
+                msg = AddNvr();
             }
 
             if (!string.IsNullOrEmpty(msg))
@@ -199,43 +199,6 @@ namespace GZKL.Client.UI.ViewsModels
                     {
                         //新增
                         sql = $"INSERT INTO NVRPara(NVRName,IP,Port,UserId,Psw) VALUES('{Model.DeviceName}','{Model.DeviceIp}',{Model.DevicePortOrChannelNo},'{Model.Password}')";
-                        OleDbHelper.ExcuteSql(sql);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                msg = ex?.Message;
-            }
-            return msg;
-        }
-
-        public string AddDvr()
-        {
-            var msg = string.Empty;
-
-            try
-            {
-                if (NvrData == null || NvrData.Count == 0)
-                {
-                    throw new Exception("请先新增硬盘录像机设备");
-                }
-
-                var pkId = NvrData.FirstOrDefault().ID;
-
-                var sql = $"SELECT * FROM DVRPara WHERE 1=1 WHERE NVRID={pkId} AND IP='{Model.DeviceIp}'";
-                using (var dt = OleDbHelper.DataTable(sql))
-                {
-                    if (dt != null && dt.Rows.Count > 0)
-                    {
-                        //更新
-                        sql = $"UPDATE DVRPara SET DVRName='{Model.DeviceName}',Channel='{Model.DevicePortOrChannelNo}' WHERE NVRID={pkId} AND IP='{HikvisionHelper.m_deviceIp}'";
-                        OleDbHelper.ExcuteSql(sql);
-                    }
-                    else
-                    {
-                        //新增
-                        sql = $"INSERT INTO DVRPara(DVRName,IP,Channel,NVRID) VALUES('{Model.DeviceName}','{Model.DeviceIp}',{Model.DevicePortOrChannelNo},'{pkId}')";
                         OleDbHelper.ExcuteSql(sql);
                     }
                 }
