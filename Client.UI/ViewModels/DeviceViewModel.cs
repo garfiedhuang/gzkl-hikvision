@@ -143,9 +143,9 @@ namespace GZKL.Client.UI.ViewsModels
 
             if (HikvisionHelper.m_lUserID < 0)
             {
-                HikvisionHelper.dwRet = NET_DVR_GetLastError();
+                HikvisionHelper.iLastErr = NET_DVR_GetLastError();
 
-                msg = $"登录设备失败，错误号为{HikvisionHelper.dwRet}";
+                msg = $"登录设备失败，错误号为{HikvisionHelper.iLastErr}";
                 LogHelper.Error(msg);
             }
             else

@@ -11,17 +11,20 @@ namespace GZKL.Client.UI.Common
     public class HikvisionHelper
     {
         //登录相关参数
-
-        public static int m_lUserID = -1;//登录返回值，具有唯一性，后续对设备的操作都需要通过此ID实现
-
+        public static Int32 m_lUserID = -1;//登录返回值，具有唯一性，后续对设备的操作都需要通过此ID实现
         public static string m_deviceIp = "";//设备IP地址
         public static int m_devicePort;//设备端口号
 
         public static string m_UserName;//登录用户名
         public static string m_Password;//登录密码
 
-        public static int dwAChanTotalNum;
-        public static int dwDChanTotalNum;
+        //错误号
+        public static bool m_bInitSDK = false;
+        public static uint iLastErr = 0;
+        public static string strErr;
+
+        //public static int dwAChanTotalNum;
+        //public static int dwDChanTotalNum;
 
         //public static NET_DVR_DEVICEINFO_V30 struDeviceInfo;//设备参数信息结构
         //public static NET_DVR_IPPARACFG_V40 m_struIpParaCfgV40;
@@ -46,9 +49,6 @@ namespace GZKL.Client.UI.Common
         public static DateTime beginRTime;
         public static DateTime endRTime;
 
-        //错误号
-        public static Int64 iLastErr;
-        public static uint dwRet;
 
         //回放开始时间点
         //public static NET_DVR_TIME playBackStartTime;
