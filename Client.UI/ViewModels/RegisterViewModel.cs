@@ -130,13 +130,10 @@ namespace GZKL.Client.UI.ViewsModels
         {
             try
             {
-                var sql = new StringBuilder(@"SELECT [id],[category],[value],[text],[remark]
-                ,[is_enabled],[is_deleted],[create_dt],[create_user_id],[update_dt],[update_user_id]
-                FROM [dbo].[sys_config] WHERE [category]=@category AND [is_deleted]=0");
+                var sql = $@"SELECT [id],[category],[value],[text],[remark],[is_deleted],[create_dt],[create_user_id],[update_dt],[update_user_id]
+                FROM [sys_config] WHERE [category]='System-{fullName}' AND [is_deleted]=0";
 
-                var parameters = new SqlParameter[] { new SqlParameter("@category", $"System-{fullName}") };
-
-                using (var data = SQLHelper.GetDataTable(sql.ToString(), parameters))
+                using (var data = OleDbHelper.DataTable(sql.ToString()))
                 {
                     if (data != null && data.Rows.Count == 3)
                     {

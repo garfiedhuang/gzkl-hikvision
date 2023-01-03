@@ -14,10 +14,6 @@ namespace GZKL.Client.UI.ViewsModels
 {
     public class LoginViewModel : ViewModelBase
     {
-        /// <summary>
-        /// Access数据库本地路径
-        /// </summary>
-        private readonly string _dbPath= Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"Database", "JCDVRRecord.mdb");
 
         public LoginViewModel()
         {
@@ -127,7 +123,7 @@ namespace GZKL.Client.UI.ViewsModels
             //用户
             var sql = $"SELECT * FROM [sys_user] WHERE [is_deleted]=0 AND [name]='{userName}' AND [password]='{Password}'";
 
-            using (var dt = OleDbHelper.DataTable(sql, _dbPath))
+            using (var dt = OleDbHelper.DataTable(sql))
             {
                 if (dt != null && dt.Rows.Count > 0)
                 {
@@ -230,7 +226,7 @@ namespace GZKL.Client.UI.ViewsModels
 
             var sql = $"SELECT * FROM [sys_config] WHERE [category]='{hostName}' AND [is_deleted]=0";
 
-            using (var dt = OleDbHelper.DataTable(sql, _dbPath))
+            using (var dt = OleDbHelper.DataTable(sql))
             {
                 foreach (DataRow dr in dt?.Rows)
                 {
@@ -283,15 +279,15 @@ namespace GZKL.Client.UI.ViewsModels
 
                         updateSql = $@"UPDATE [sys_config] SET [text]='{property.GetValue(loginModel, null)}',[update_dt]=Now() WHERE [category]='{hostName}' AND [value]='{property.Name}' AND [is_deleted]=0";
 
-                        var effectRows = Convert.ToInt32(OleDbHelper.ExecuteScalar(querySql, _dbPath));
+                        var effectRows = Convert.ToInt32(OleDbHelper.ExecuteScalar(querySql));
 
                         if (effectRows == 0)
                         {
-                            OleDbHelper.ExcuteSql(insertSql, _dbPath);
+                            OleDbHelper.ExcuteSql(insertSql);
                         }
                         else
                         {
-                            OleDbHelper.ExcuteSql(updateSql, _dbPath);
+                            OleDbHelper.ExcuteSql(updateSql);
                         }
                     }
 
@@ -300,8 +296,6 @@ namespace GZKL.Client.UI.ViewsModels
                 {
                     LogHelper.Error($"保存登录配置失败，{ex?.Message}");
                 }
-
-
             });
         }
     }

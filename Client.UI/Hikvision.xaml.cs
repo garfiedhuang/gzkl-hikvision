@@ -15,29 +15,9 @@ namespace GZKL.Client.UI
         {
             InitializeComponent();
 
-            //this.txtTitle.Title = $"XXXXXX系统({GetEdition()})";
-            
+            this.tbTitle.Text = $"XXXXXX系统({GetEdition()})";
 
             this.DataContext = new HikvisionViewModel(loginSuccessModel);
-            /*
-            Messenger.Default.Register<string>(this, "ExpandMenu", arg =>
-            {
-                if (this.menu.Width < 200)
-                {
-                    this.xpUserInfo.Visibility = Visibility.Visible;
-                    AnimationHelper.CreateWidthChangedAnimation(this.menu, 60, 200, new TimeSpan(0, 0, 0, 0, 300));
-                }
-                else
-                {
-                    this.xpUserInfo.Visibility = Visibility.Collapsed;
-                    AnimationHelper.CreateWidthChangedAnimation(this.menu, 200, 60, new TimeSpan(0, 0, 0, 0, 300));
-                }
-
-                //由于...
-                var template = this.IC.ItemTemplateSelector;
-                this.IC.ItemTemplateSelector = null;
-                this.IC.ItemTemplateSelector = template;              
-            });*/
         }
 
         public static string GetEdition()

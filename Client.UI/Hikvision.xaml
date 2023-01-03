@@ -72,37 +72,12 @@
                 </Border.Effect>
                 <UniformGrid  VerticalAlignment="Center" Height="40" Margin="0" Columns="2">
                     <StackPanel Orientation="Horizontal" Margin="5 0 0 0" VerticalAlignment="Center">
-                        <Button Margin="5 0 0 0">
-                            <Button.Style>
-                                <Style TargetType="Button">
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="Button">
-                                                <Border Background="Transparent" Name="back">
-                                                    <WrapPanel>
-                                                        <Image Source="/Assets/Images/icon.ico" Width="25" Height="25" />
-
-                                                        <TextBlock x:Name="txtTitle" 
-                                                                   FontSize="18" 
-                                                                   Foreground="#5a5e66" 
-                                                                   Margin="5 0 0 0" 
-                                                                   HorizontalAlignment="Right" 
-                                                                   VerticalAlignment="Center" />
-
-                                                    </WrapPanel>
-                                                </Border>
-                                                <ControlTemplate.Triggers>
-                                                    <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter TargetName="back" Property="Background" Value="#f8f9fb"></Setter>
-                                                        <Setter TargetName="back" Property="Opacity" Value="0.5"></Setter>
-                                                    </Trigger>
-                                                </ControlTemplate.Triggers>
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                </Style>
-                            </Button.Style>
-                        </Button>
+                        <Border Background="Transparent" Name="back">
+                            <WrapPanel>
+                                <Image Source="/Assets/Images/icon.ico" Width="25" Height="25" />
+                                <TextBlock x:Name="tbTitle" FontSize="18" Foreground="#5a5e66" Margin="5 0 0 0" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                            </WrapPanel>
+                        </Border>
                     </StackPanel>
                     <StackPanel HorizontalAlignment="Right" Margin="0 0 15 0">
                         <StackPanel Grid.Column="1" Orientation="Horizontal">

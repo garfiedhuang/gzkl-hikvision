@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Data.Odbc;
+using System.IO;
 
 namespace GZKL.Client.UI.Common
 {
@@ -13,6 +14,9 @@ namespace GZKL.Client.UI.Common
     {
         protected static OleDbConnection conn = new OleDbConnection();
         protected static OleDbCommand comm = new OleDbCommand();
+
+        public static readonly string _dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database", "JCDVRRecord.mdb");
+
         public OleDbHelper()
         {
             //init
@@ -21,8 +25,14 @@ namespace GZKL.Client.UI.Common
         /// <summary>
         /// 打开数据库
         /// </summary>
-        public static void OpenConnection(string path)
+        /// <param name="path"></param>
+        /// <exception cref="Exception"></exception>
+        public static void OpenConnection(string path="")
         {
+            if (string.IsNullOrEmpty(path))
+            {
+                path = _dbPath;
+            }
             if (conn.State == ConnectionState.Closed)
             {
                 //conn.ConnectionString = $"Provider=Microsoft.Jet.OleDb.4.0;Data Source={path};Persist Security Info=False";//web.config文件里设定。
@@ -54,8 +64,15 @@ namespace GZKL.Client.UI.Common
         /// 执行sql语句
         /// </summary>
         /// <param name="sqlstr"></param>
-        public static void ExcuteSql(string sqlstr, string path)
+        /// <param name="path"></param>
+        /// <exception cref="Exception"></exception>
+        public static void ExcuteSql(string sqlstr, string path="")
         {
+            if (string.IsNullOrEmpty(path))
+            {
+                path = _dbPath;
+            }
+
             try
             {
                 OpenConnection(path);
@@ -75,9 +92,15 @@ namespace GZKL.Client.UI.Common
         /// 返回指定sql语句的OleDbDataReader对象，使用时请注意关闭这个对象。
         /// </summary>
         /// <param name="sqlstr"></param>
+        /// <param name="path"></param>
         /// <returns></returns>
-        public static OleDbDataReader DataReader(string sqlstr, string path)
+        public static OleDbDataReader DataReader(string sqlstr, string path="")
         {
+            if (string.IsNullOrEmpty(path))
+            {
+                path = _dbPath;
+            }
+
             OleDbDataReader dr = null;
             try
             {
@@ -103,8 +126,13 @@ namespace GZKL.Client.UI.Common
         /// </summary>
         /// <param name="sqlstr"></param>
         /// <param name="dr"></param>
-        public static void DataReader(string sqlstr, ref OleDbDataReader dr, string path)
+        /// <param name="path"></param>
+        public static void DataReader(string sqlstr, ref OleDbDataReader dr, string path = "")
         {
+            if (string.IsNullOrEmpty(path))
+            {
+                path = _dbPath;
+            }
             try
             {
                 OpenConnection(path);
@@ -134,9 +162,14 @@ namespace GZKL.Client.UI.Common
         /// 返回指定sql语句的object对象，使用时请注意关闭这个对象。
         /// </summary>
         /// <param name="sqlstr"></param>
+        /// <param name="path"></param>
         /// <returns></returns>
-        public static object ExecuteScalar(string sqlstr, string path)
+        public static object ExecuteScalar(string sqlstr, string path = "")
         {
+            if (string.IsNullOrEmpty(path))
+            {
+                path = _dbPath;
+            }
             object obj = null;
             try
             {
@@ -160,9 +193,16 @@ namespace GZKL.Client.UI.Common
         /// 返回指定sql语句的dataset
         /// </summary>
         /// <param name="sqlstr"></param>
+        /// <param name="path"></param>
         /// <returns></returns>
-        public static DataSet DataSet(string sqlstr, string path)
+        /// <exception cref="Exception"></exception>
+        public static DataSet DataSet(string sqlstr, string path = "")
         {
+            if (string.IsNullOrEmpty(path))
+            {
+                path = _dbPath;
+            }
+
             DataSet ds = new DataSet();
             OleDbDataAdapter da = new OleDbDataAdapter();
             try
@@ -189,8 +229,15 @@ namespace GZKL.Client.UI.Common
         /// </summary>
         /// <param name="sqlstr"></param>
         /// <param name="ds"></param>
-        public static void DataSet(string sqlstr, ref DataSet ds, string path)
+        /// <param name="path"></param>
+        /// <exception cref="Exception"></exception>
+        public static void DataSet(string sqlstr, ref DataSet ds, string path = "")
         {
+            if (string.IsNullOrEmpty(path))
+            {
+                path = _dbPath;
+            }
+
             OleDbDataAdapter da = new OleDbDataAdapter();
             try
             {
@@ -214,9 +261,16 @@ namespace GZKL.Client.UI.Common
         /// 返回指定sql语句的datatable
         /// </summary>
         /// <param name="sqlstr"></param>
+        /// <param name="path"></param>
         /// <returns></returns>
-        public static DataTable DataTable(string sqlstr, string path)
+        /// <exception cref="Exception"></exception>
+        public static DataTable DataTable(string sqlstr, string path = "")
         {
+            if (string.IsNullOrEmpty(path))
+            {
+                path = _dbPath;
+            }
+
             DataTable dt = new DataTable();
             OleDbDataAdapter da = new OleDbDataAdapter();
             try
@@ -243,8 +297,15 @@ namespace GZKL.Client.UI.Common
         /// </summary>
         /// <param name="sqlstr"></param>
         /// <param name="dt"></param>
-        public static void DataTable(string sqlstr, ref DataTable dt, string path)
+        /// <param name="path"></param>
+        /// <exception cref="Exception"></exception>
+        public static void DataTable(string sqlstr, ref DataTable dt, string path = "")
         {
+            if (string.IsNullOrEmpty(path))
+            {
+                path = _dbPath;
+            }
+
             OleDbDataAdapter da = new OleDbDataAdapter();
             try
             {
@@ -268,9 +329,16 @@ namespace GZKL.Client.UI.Common
         /// 返回指定sql语句的dataview
         /// </summary>
         /// <param name="sqlstr"></param>
+        /// <param name="path"></param>
         /// <returns></returns>
-        public static DataView DataView(string sqlstr, string path)
+        /// <exception cref="Exception"></exception>
+        public static DataView DataView(string sqlstr, string path = "")
         {
+            if (string.IsNullOrEmpty(path))
+            {
+                path = _dbPath;
+            }
+
             OleDbDataAdapter da = new OleDbDataAdapter();
             DataView dv = new DataView();
             DataSet ds = new DataSet();
