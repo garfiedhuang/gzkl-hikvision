@@ -56,7 +56,7 @@
         </Style>
 
         <cv:CheckConverter x:Key="checkConverter"/>
-        
+
     </Window.Resources>
 
     <Grid Background="White">
@@ -72,18 +72,8 @@
 
             <StackPanel Grid.Row="0">
                 <GroupBox x:Name="gbSampleInfo" Height="100"  Header="" Style="{StaticResource GroupBoxOriginal}" HorizontalContentAlignment="Left">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="15*"></ColumnDefinition>
-                            <ColumnDefinition Width="85*"></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-                        <WrapPanel Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center">
-                            <RadioButton Margin="8" Content="录像机" GroupName="deviceType" Command="{Binding RbSelectedChangedCmd}" IsChecked="{Binding Model.DeviceType,Mode=TwoWay,Converter={StaticResource checkConverter},ConverterParameter=VR}" Background="{DynamicResource PrimaryBrush}" Foreground="{DynamicResource PrimaryTextBrush}"/>
-                            <RadioButton Margin="8" Content="摄像机" GroupName="deviceType" Command="{Binding RbSelectedChangedCmd}" IsChecked="{Binding Model.DeviceType,Mode=TwoWay,Converter={StaticResource checkConverter},ConverterParameter=VC}" Background="{DynamicResource PrimaryBrush}" Foreground="{DynamicResource PrimaryTextBrush}"/>
-                        </WrapPanel>
-
-                        <WrapPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center">
-                            <hc:TextBox Margin="2" Width="250"
+                    <WrapPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <hc:TextBox Margin="2" Width="250"
                             x:Name="txtDeviceName"
                             hc:TitleElement.TitlePlacement="Left"
                             hc:InfoElement.Placeholder="请输入设备名称" 
@@ -91,7 +81,7 @@
                             hc:InfoElement.Title="设备名称："
                             hc:InfoElement.Necessary="False"/>
 
-                            <hc:TextBox Margin="2" Width="250"
+                        <hc:TextBox Margin="2" Width="250"
                             x:Name="txtDeviceIp"
                             hc:TitleElement.TitlePlacement="Left"
                             hc:InfoElement.Placeholder="请输入设备IP" 
@@ -99,35 +89,32 @@
                             hc:InfoElement.Title="设备IP："
                             hc:InfoElement.Necessary="False"/>
 
-                            <hc:TextBox Margin="2" Width="250"
-                            x:Name="txtDevicePortOrChannelNo"
+                        <hc:TextBox Margin="2" Width="250"
+                            x:Name="txtDevicePort"
                             hc:TitleElement.TitlePlacement="Left"
                             hc:InfoElement.Placeholder="请输入设备端口" 
-                            Text="{Binding Model.DevicePortOrChannelNo,Mode=TwoWay}"
-                            hc:InfoElement.Title="{Binding DevicePortOrChannelNoContent}"
+                            Text="{Binding Model.DevicePort,Mode=TwoWay}"
+                            hc:InfoElement.Title="设备端口："
                             hc:InfoElement.Necessary="False"/>
 
-                            <hc:TextBox Margin="2" Width="250"
+                        <hc:TextBox Margin="2" Width="250"
                             x:Name="txtUserName"
                             hc:TitleElement.TitlePlacement="Left"
                             hc:InfoElement.Placeholder="请输入用户名" 
                             Text="{Binding Model.UserName,Mode=TwoWay}"
-                            Visibility="{Binding UserNameAndPasswordVisable}"
-                            hc:InfoElement.Title="用户名："
+                            hc:InfoElement.Title="用  户  名："
                             hc:InfoElement.Necessary="False"/>
 
-                            <hc:TextBox Margin="2" Width="250"
+                        <hc:TextBox Margin="2" Width="250"
                             x:Name="txtPassword"
                             hc:TitleElement.TitlePlacement="Left"
                             hc:InfoElement.Placeholder="请输入密码" 
                             Text="{Binding Model.Password,Mode=TwoWay}"
-                            Visibility="{Binding UserNameAndPasswordVisable}"
-                            hc:InfoElement.Title="密码："
+                            hc:InfoElement.Title="密   码："
                             hc:InfoElement.Necessary="False"/>
-                        </WrapPanel>
-                    </Grid>
+                    </WrapPanel>
                 </GroupBox>
-                
+
                 <WrapPanel HorizontalAlignment="Right" VerticalAlignment="Center">
                     <Button x:Name="btnAdd" Content="新增设备" Command="{Binding AddDeviceCmd}" Width="100" Margin="0,5,10,0" hc:BorderElement.CornerRadius="5"/>
                     <Button x:Name="btnReset" Content="清空设置" Command="{Binding ResetDeviceCmd}" Width="100" Margin="0,5,12,0" hc:BorderElement.CornerRadius="5"/>
@@ -170,7 +157,7 @@
                                 <DataGridTextColumn IsReadOnly="True" MinWidth="60" Binding="{Binding Id}" Header="ID"/>
                                 <DataGridTextColumn IsReadOnly="True" MinWidth="120" Binding="{Binding DeviceName}" Header="设备名称"/>
                                 <DataGridTextColumn IsReadOnly="True" MinWidth="120" Binding="{Binding DeviceIp}" Header="设备IP"/>
-                                <DataGridTextColumn IsReadOnly="True" MinWidth="120" Binding="{Binding DeviceChannelNo}" Header="设备通道"/>
+                                <DataGridTextColumn IsReadOnly="True" MinWidth="120" Binding="{Binding ChannelNo}" Header="设备通道"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </GroupBox>

@@ -1,9 +1,5 @@
-﻿using GZKL.Client.UI.Models;
-using System;
-using System.IO;
+﻿using System;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Windows.Controls;
 using System.Windows.Interop;
 using static GZKL.Client.UI.Common.CHCNetSDK;
 
@@ -12,43 +8,28 @@ namespace GZKL.Client.UI.Common
     public class HikvisionHelper
     {
         //登录相关参数
-        public static Int32 m_lUserID = -1;//登录返回值，具有唯一性，后续对设备的操作都需要通过此ID实现
-        public static string m_deviceIp = "";//设备IP地址
+        public static bool m_bInitSDK = false;
+        public static int m_lUserID = -1;//登录返回值
+        public static string m_deviceIp = "";//设备IP
         public static int m_devicePort;//设备端口号
 
         public static string m_UserName;//登录用户名
         public static string m_Password;//登录密码
 
         //错误号
-        public static bool m_bInitSDK = false;
         public static uint iLastErr = 0;
         public static string strErr;
 
-        //public static int dwAChanTotalNum;
-        //public static int dwDChanTotalNum;
-
-        //public static NET_DVR_DEVICEINFO_V30 struDeviceInfo;//设备参数信息结构
-        //public static NET_DVR_IPPARACFG_V40 m_struIpParaCfgV40;
-
-        //public static NET_DVR_IPCHANINFO m_struChanInfo;
-        //public static NET_DVR_IPCHANINFO_V40 m_struChanInfoV40;
-        //public static NET_DVR_PU_STREAM_URL m_struStreamURL;
-
-        public static CHCNetSDK.NET_DVR_DEVICECFG_V40 m_struDeviceCfg;
-        public static CHCNetSDK.NET_DVR_NETCFG_V30 m_struNetCfg;
-        public static CHCNetSDK.NET_DVR_TIME m_struTimeCfg;
-        public static CHCNetSDK.NET_DVR_DEVICEINFO_V30 m_struDeviceInfo;
-        public static CHCNetSDK.NET_DVR_IPPARACFG_V40 m_struIpParaCfgV40;
-
+        public static NET_DVR_DEVICECFG_V40 m_struDeviceCfg;
+        public static NET_DVR_NETCFG_V30 m_struNetCfg;
+        public static NET_DVR_TIME m_struTimeCfg;
+        public static NET_DVR_DEVICEINFO_V30 m_struDeviceInfo;
+        public static NET_DVR_IPPARACFG_V40 m_struIpParaCfgV40;
 
         //预览相关参数
-        public static Int64 lRealHandle;//预览句柄
+        public static long lRealHandle;//预览句柄
         public static NET_DVR_CLIENTINFO struPlayInfo;//预览参数
         public static NET_DVR_PREVIEWINFO lpPreviewInfo;
-        //public static Pointer pUser;//用户数据
-
-        public static DateTime beginRTime;
-        public static DateTime endRTime;
 
 
         //回放开始时间点
@@ -56,14 +37,13 @@ namespace GZKL.Client.UI.Common
         //public static int[] iChannelNum=new int[64];
 
         //回放下载相关参数
-        public static int m_lPlayHandle;
-        public static int iDownloadHandle;
-        public static bool isRecording;
+        public static Int32 m_lFindHandle = -1;
+        public static Int32 m_lPlayHandle = -1;
+        public static Int32 m_lDownHandle = -1;
 
-
-        private static bool m_bPause = false;
-        private static bool m_bReverse = false;
-        private static bool m_bSound = false;
+        public static bool m_bPause = false;
+        public static bool m_bReverse = false;
+        public static bool m_bSound = false;
 
 
         public static CHAN_INFO m_struChanNoInfo = new CHAN_INFO();
@@ -81,7 +61,12 @@ namespace GZKL.Client.UI.Common
             }
         }
 
-
+        /// <summary>
+        /// 设置IP摄像机
+        /// </summary>
+        /// <param name="nvrId"></param>
+        /// <param name="sIp"></param>
+        /// <param name="sChannel"></param>
         public static void SetIPDVR(int nvrId,string sIp,string sChannel)
         {
             try
@@ -113,8 +98,17 @@ namespace GZKL.Client.UI.Common
             }
         }
 
-        public static void myDVR_INT(int nvrId)
+        /// <summary>
+        /// 初始化摄像机设备
+        /// </summary>
+        /// <param name="nvrId"></param>
+        public static void InitDvrDevice(int nvrId)
         {
+            if (m_lUserID < 0)
+            {
+                throw new Exception($"未登录设备，请先登录设备后再试！");
+            }
+
             int i = 0, j = 0;
             string strErr, sChannel, sIp;
             m_struChanNoInfo.Init();
@@ -122,7 +116,6 @@ namespace GZKL.Client.UI.Common
             uint dwDChanTotalNum = (uint)m_struDeviceInfo.byIPChanNum + 256 * (uint)m_struDeviceInfo.byHighDChanNum;
 
             if (dwDChanTotalNum <= 0) return;
-
 
             uint dwSize = (uint)Marshal.SizeOf(m_struIpParaCfgV40);
 
@@ -132,9 +125,9 @@ namespace GZKL.Client.UI.Common
             uint dwReturn = 0;
             int iGroupNo = 0;  //该Demo仅获取第一组64个通道，如果设备IP通道大于64路，需要按组号0~i多次调用NET_DVR_GET_IPPARACFG_V40获取
 
-            if (!CHCNetSDK.NET_DVR_GetDVRConfig(m_lUserID, CHCNetSDK.NET_DVR_GET_IPPARACFG_V40, iGroupNo, ptrIpParaCfgV40, dwSize, ref dwReturn))
+            if (!NET_DVR_GetDVRConfig(m_lUserID, NET_DVR_GET_IPPARACFG_V40, iGroupNo, ptrIpParaCfgV40, dwSize, ref dwReturn))
             {
-                iLastErr = CHCNetSDK.NET_DVR_GetLastError();
+                iLastErr = NET_DVR_GetLastError();
                 strErr = $"获取NET_DVR_GET_IPPARACFG_V40失败, 错误号为：{iLastErr}";
                 LogHelper.Error(strErr);
 
@@ -142,7 +135,7 @@ namespace GZKL.Client.UI.Common
             }
             else
             {
-                m_struIpParaCfgV40 = (CHCNetSDK.NET_DVR_IPPARACFG_V40)Marshal.PtrToStructure(ptrIpParaCfgV40, typeof(CHCNetSDK.NET_DVR_IPPARACFG_V40));
+                m_struIpParaCfgV40 = (NET_DVR_IPPARACFG_V40)Marshal.PtrToStructure(ptrIpParaCfgV40, typeof(NET_DVR_IPPARACFG_V40));
 
                 //获取可用的模拟通道
                 for (i = 0; i < m_struIpParaCfgV40.dwAChanNum; i++)
@@ -173,7 +166,7 @@ namespace GZKL.Client.UI.Common
                 for (i = 0; i < iDChanNum; i++)
                 {
                     byStreamType = m_struIpParaCfgV40.struStreamMode[i].byGetStreamType;
-                    CHCNetSDK.NET_DVR_STREAM_MODE m_struStreamMode = new CHCNetSDK.NET_DVR_STREAM_MODE();
+                    NET_DVR_STREAM_MODE m_struStreamMode = new NET_DVR_STREAM_MODE();
                     dwSize = (uint)Marshal.SizeOf(m_struStreamMode);
 
                     sChannel = (i + (int)m_struIpParaCfgV40.dwStartDChan).ToString();
@@ -185,8 +178,8 @@ namespace GZKL.Client.UI.Common
                         case 0:
                             IntPtr ptrChanInfo = Marshal.AllocHGlobal((Int32)dwSize);
                             Marshal.StructureToPtr(m_struIpParaCfgV40.struStreamMode[i].uGetStream, ptrChanInfo, false);
-                            CHCNetSDK.NET_DVR_IPCHANINFO m_struChanInfo = new CHCNetSDK.NET_DVR_IPCHANINFO();
-                            m_struChanInfo = (CHCNetSDK.NET_DVR_IPCHANINFO)Marshal.PtrToStructure(ptrChanInfo, typeof(CHCNetSDK.NET_DVR_IPCHANINFO));
+                            NET_DVR_IPCHANINFO m_struChanInfo = new NET_DVR_IPCHANINFO();
+                            m_struChanInfo = (NET_DVR_IPCHANINFO)Marshal.PtrToStructure(ptrChanInfo, typeof(NET_DVR_IPCHANINFO));
 
                             //列出IP通道 List the IP channel
                             if (m_struChanInfo.byEnable == 1 && m_struChanInfo.byIPID != 0)
@@ -204,8 +197,8 @@ namespace GZKL.Client.UI.Common
                         case 6:
                             IntPtr ptrChanInfoV40 = Marshal.AllocHGlobal((Int32)dwSize);
                             Marshal.StructureToPtr(m_struIpParaCfgV40.struStreamMode[i].uGetStream, ptrChanInfoV40, false);
-                            CHCNetSDK.NET_DVR_IPCHANINFO_V40 m_struChanInfoV40 = new CHCNetSDK.NET_DVR_IPCHANINFO_V40();
-                            m_struChanInfoV40 = (CHCNetSDK.NET_DVR_IPCHANINFO_V40)Marshal.PtrToStructure(ptrChanInfoV40, typeof(CHCNetSDK.NET_DVR_IPCHANINFO_V40));
+                            NET_DVR_IPCHANINFO_V40 m_struChanInfoV40 = new NET_DVR_IPCHANINFO_V40();
+                            m_struChanInfoV40 = (NET_DVR_IPCHANINFO_V40)Marshal.PtrToStructure(ptrChanInfoV40, typeof(NET_DVR_IPCHANINFO_V40));
 
                             //列出IP通道 List the IP channel
                             if (m_struChanInfoV40.byEnable == 1 && m_struChanInfoV40.wIPID != 0)
@@ -227,14 +220,57 @@ namespace GZKL.Client.UI.Common
             }
         }
 
+        /// <summary>
+        /// 校时
+        /// </summary>
+        public static void TimeSet()
+        {
+            if (m_lUserID < 0)
+            {
+                throw new Exception($"未登录设备，请先登录设备后再试！");
+            }
+
+            var dtNow = DateTime.Now;
+
+            m_struTimeCfg.dwYear = dtNow.Year;
+            m_struTimeCfg.dwMonth = dtNow.Month;
+            m_struTimeCfg.dwDay = dtNow.Day;
+            m_struTimeCfg.dwHour = dtNow.Hour;
+            m_struTimeCfg.dwMinute = dtNow.Minute;
+            m_struTimeCfg.dwSecond = dtNow.Second;
+
+            int nSize = Marshal.SizeOf(m_struTimeCfg);
+            IntPtr ptrTimeCfg = Marshal.AllocHGlobal(nSize);
+            Marshal.StructureToPtr(m_struTimeCfg, ptrTimeCfg, false);
+
+            if (!NET_DVR_SetDVRConfig(m_lUserID, NET_DVR_SET_TIMECFG, -1, ptrTimeCfg, (uint)nSize))
+            {
+                iLastErr = NET_DVR_GetLastError();
+                strErr = "NET_DVR_SET_TIMECFG failed, error code= " + iLastErr;
+                //设置时间失败，输出错误号 Failed to set the time of device and output the error code
+
+                LogHelper.Error(strErr);
+
+                HandyControl.Controls.Growl.Error(strErr);
+            }
+            else
+            {
+                HandyControl.Controls.Growl.Info("校时成功！");
+            }
+
+            Marshal.FreeHGlobal(ptrTimeCfg);
+        }
+
+        //public static void 
+
         public static void PlayBackTime(DateTime startTime, DateTime endTime, string dvrName)
         {
             if (m_lPlayHandle >= 0)
             {
                 //如果已经正在回放，先停止回放
-                if (!CHCNetSDK.NET_DVR_StopPlayBack(m_lPlayHandle))
+                if (!NET_DVR_StopPlayBack(m_lPlayHandle))
                 {
-                    iLastErr = CHCNetSDK.NET_DVR_GetLastError();
+                    iLastErr = NET_DVR_GetLastError();
                     strErr = "NET_DVR_StopPlayBack failed, error code= " + iLastErr;
 
                     LogHelper.Error(strErr);
@@ -256,7 +292,7 @@ namespace GZKL.Client.UI.Common
                 //PlaybackprogressBar.Value = 0;
             }
 
-            CHCNetSDK.NET_DVR_VOD_PARA struVodPara = new CHCNetSDK.NET_DVR_VOD_PARA();
+            NET_DVR_VOD_PARA struVodPara = new NET_DVR_VOD_PARA();
             struVodPara.dwSize = (uint)Marshal.SizeOf(struVodPara);
             //struVodPara.struIDInfo.dwChannel = (uint)iChannelNum[(int)iSelIndex]; //通道号 Channel number  
             //struVodPara.hWnd = VideoPlayWnd.Handle;//回放窗口句柄
@@ -278,10 +314,10 @@ namespace GZKL.Client.UI.Common
             struVodPara.struEndTime.dwSecond = endTime.Second;
 
             //按时间回放 Playback by time
-            m_lPlayHandle = CHCNetSDK.NET_DVR_PlayBackByTime_V40(m_lUserID, ref struVodPara);
+            m_lPlayHandle = NET_DVR_PlayBackByTime_V40(m_lUserID, ref struVodPara);
             if (m_lPlayHandle < 0)
             {
-                iLastErr = CHCNetSDK.NET_DVR_GetLastError();
+                iLastErr = NET_DVR_GetLastError();
                 strErr = "NET_DVR_PlayBackByTime_V40 failed, error code= " + iLastErr;
 
                 LogHelper.Error(strErr);
@@ -291,9 +327,9 @@ namespace GZKL.Client.UI.Common
             }
 
             uint iOutValue = 0;
-            if (!CHCNetSDK.NET_DVR_PlayBackControl_V40(m_lPlayHandle, CHCNetSDK.NET_DVR_PLAYSTART, IntPtr.Zero, 0, IntPtr.Zero, ref iOutValue))
+            if (!NET_DVR_PlayBackControl_V40(m_lPlayHandle, NET_DVR_PLAYSTART, IntPtr.Zero, 0, IntPtr.Zero, ref iOutValue))
             {
-                iLastErr = CHCNetSDK.NET_DVR_GetLastError();
+                iLastErr = NET_DVR_GetLastError();
                 strErr = "NET_DVR_PLAYSTART failed, error code= " + iLastErr; //回放控制失败，输出错误号
 
                 LogHelper.Error(strErr);
@@ -314,9 +350,9 @@ namespace GZKL.Client.UI.Common
             }
 
             //停止回放
-            if (!CHCNetSDK.NET_DVR_StopPlayBack(m_lPlayHandle))
+            if (!NET_DVR_StopPlayBack(m_lPlayHandle))
             {
-                iLastErr = CHCNetSDK.NET_DVR_GetLastError();
+                iLastErr = NET_DVR_GetLastError();
                 strErr = "NET_DVR_StopPlayBack failed, error code= " + iLastErr;
                 LogHelper.Error(strErr);
 
@@ -346,9 +382,9 @@ namespace GZKL.Client.UI.Common
 
             if (!m_bPause)
             {
-                if (!CHCNetSDK.NET_DVR_PlayBackControl_V40(m_lPlayHandle, CHCNetSDK.NET_DVR_PLAYPAUSE, IntPtr.Zero, 0, IntPtr.Zero, ref iOutValue))
+                if (!NET_DVR_PlayBackControl_V40(m_lPlayHandle, NET_DVR_PLAYPAUSE, IntPtr.Zero, 0, IntPtr.Zero, ref iOutValue))
                 {
-                    iLastErr = CHCNetSDK.NET_DVR_GetLastError();
+                    iLastErr = NET_DVR_GetLastError();
                     strErr = "NET_DVR_PLAYPAUSE failed, error code= " + iLastErr; //回放控制失败，输出错误号
                     LogHelper.Error(strErr);
 
@@ -361,9 +397,9 @@ namespace GZKL.Client.UI.Common
             }
             else
             {
-                if (!CHCNetSDK.NET_DVR_PlayBackControl_V40(m_lPlayHandle, CHCNetSDK.NET_DVR_PLAYRESTART, IntPtr.Zero, 0, IntPtr.Zero, ref iOutValue))
+                if (!NET_DVR_PlayBackControl_V40(m_lPlayHandle, NET_DVR_PLAYRESTART, IntPtr.Zero, 0, IntPtr.Zero, ref iOutValue))
                 {
-                    iLastErr = CHCNetSDK.NET_DVR_GetLastError();
+                    iLastErr = NET_DVR_GetLastError();
                     strErr = "NET_DVR_PLAYRESTART failed, error code= " + iLastErr; //回放控制失败，输出错误号
                     LogHelper.Error(strErr);
 
@@ -377,19 +413,6 @@ namespace GZKL.Client.UI.Common
             return;
         }
 
-        public static NET_DVR_TIME DateTimeToDVRTime(DateTime localTime)
-        {
-            throw new NotImplementedException();
-        }
 
-        public static DateTime DVRTimeToDateTime(NET_DVR_TIME dvrTime)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static Int64 SetShowString(string txt,Int64 lChannel,string showTxt)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

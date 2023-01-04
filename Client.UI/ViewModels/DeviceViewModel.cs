@@ -8,6 +8,7 @@ using System;
 using System.Data;
 using System.Linq;
 using System.Collections.ObjectModel;
+using System.Windows.Interop;
 
 namespace GZKL.Client.UI.ViewsModels
 {
@@ -18,20 +19,13 @@ namespace GZKL.Client.UI.ViewsModels
         /// </summary>
         public DeviceViewModel()
         {
-            RbSelectedChangedCmd = new RelayCommand<object>(this.RbSelectedChanged);
             AddDeviceCmd = new RelayCommand(this.AddDevice);
             ResetDeviceCmd = new RelayCommand(this.ResetDevice);
 
-
-            QueryDevice();
+            this.QueryDevice();
         }
 
         #region Command
-
-        /// <summary>
-        /// 设备类型选择改变命令
-        /// </summary>
-        public RelayCommand<object> RbSelectedChangedCmd { get; set; }
 
         /// <summary>
         /// 新增设备命令
@@ -87,38 +81,9 @@ namespace GZKL.Client.UI.ViewsModels
             set { userNameAndPasswordVisable = value; RaisePropertyChanged(); }
         }
 
-        /// <summary>
-        /// 设备端口或通道号标题
-        /// </summary>
-        private string devicePortOrChannelNoContent = "设备端口";
-        public string DevicePortOrChannelNoContent
-        {
-            get { return devicePortOrChannelNoContent; }
-            set { devicePortOrChannelNoContent = value; RaisePropertyChanged(); }
-        }
-
         #endregion
 
         #region =====methods
-
-        private void RbSelectedChanged(object commandParameter)
-        {
-            var param = commandParameter?.ToString();
-
-            switch (param)
-            {
-                case "VR"://录像机
-                    devicePortOrChannelNoContent = "设备端口";
-                    this.userNameAndPasswordVisable = Visibility.Visible;
-
-                    break;
-                case "VC"://摄像机
-                    devicePortOrChannelNoContent = "通道号";
-                    this.userNameAndPasswordVisable = Visibility.Hidden;
-
-                    break;
-            }
-        }
 
         /// <summary>
         /// 新增设备
@@ -126,54 +91,66 @@ namespace GZKL.Client.UI.ViewsModels
         private void AddDevice()
         {
             var msg = string.Empty;
+            var nvrId = 0;
 
-            //参数赋值
-            if (HikvisionHelper.m_lUserID >= 0)
+            try
             {
-                NET_DVR_Logout(HikvisionHelper.m_lUserID);
+                //校验是否登录状态？如果是，先执行登出操作
+                if (HikvisionHelper.m_lUserID >= 0)
+                {
+                    NET_DVR_Logout(HikvisionHelper.m_lUserID);
+                }
+
+                //参数赋值
+                HikvisionHelper.m_deviceIp = Model.DeviceIp;
+                HikvisionHelper.m_devicePort = Model.DevicePort;
+                HikvisionHelper.m_UserName = Model.UserName;
+                HikvisionHelper.m_Password = Model.Password;
+
+                //登录设备
+                HikvisionHelper.m_lUserID = NET_DVR_Login_V30(HikvisionHelper.m_deviceIp, HikvisionHelper.m_devicePort, HikvisionHelper.m_UserName, HikvisionHelper.m_Password, ref HikvisionHelper.m_struDeviceInfo);
+
+                if (HikvisionHelper.m_lUserID < 0)
+                {
+                    HikvisionHelper.iLastErr = NET_DVR_GetLastError();
+
+                    msg = $"登录设备失败，错误号为{HikvisionHelper.iLastErr}";
+                }
+                else
+                {
+                    msg = AddNvr(out nvrId);
+                }
+
+                if (!string.IsNullOrEmpty(msg))
+                {
+                    LogHelper.Warn(msg);
+                    HandyControl.Controls.Growl.Warning(msg);
+                }
+                else
+                {
+                    //初始化设备
+                    HikvisionHelper.InitDvrDevice(nvrId);
+
+                    //刷新网格数据
+                    this.QueryDevice();
+
+                    HandyControl.Controls.Growl.Info("保存成功");
+                }
             }
-
-            HikvisionHelper.m_deviceIp = Model.DeviceIp;
-            HikvisionHelper.m_devicePort = Model.DevicePortOrChannelNo;
-            HikvisionHelper.m_UserName = Model.UserName;
-            HikvisionHelper.m_Password = Model.Password;
-
-            //登录设备
-            HikvisionHelper.m_lUserID = NET_DVR_Login_V30(HikvisionHelper.m_deviceIp, HikvisionHelper.m_devicePort, HikvisionHelper.m_UserName, HikvisionHelper.m_Password,ref HikvisionHelper.m_struDeviceInfo);
-
-            if (HikvisionHelper.m_lUserID < 0)
+            catch (Exception ex)
             {
-                HikvisionHelper.iLastErr = NET_DVR_GetLastError();
-
-                msg = $"登录设备失败，错误号为{HikvisionHelper.iLastErr}";
+                msg = ex?.Message;
                 LogHelper.Error(msg);
-            }
-            else
-            {
-                msg = AddNvr();
-            }
-
-            if (!string.IsNullOrEmpty(msg))
-            {
-                HandyControl.Controls.Growl.Warning(msg);
-            }
-            else
-            {
-                //刷新网格数据
-               QueryDevice();
-
-                //初始化设备
-                var nvrId = NvrData.FirstOrDefault()?.ID;
-
-
-                HandyControl.Controls.Growl.Info("保存成功");
+                HandyControl.Controls.Growl.Error(msg);
             }
         }
 
 
-        public string AddNvr()
+        public string AddNvr(out int nvrId)
         {
             var msg = string.Empty;
+
+            nvrId = 0;
 
             try
             {
@@ -186,8 +163,8 @@ namespace GZKL.Client.UI.ViewsModels
                         if (tmpRow == 1)
                         {
                             //更新
-                            sql = $"UPDATE NVRPara SET Port={Model.DevicePortOrChannelNo},NVRName='{Model.DeviceName}',UserId='{Model.UserName}',pwd='{Model.Password}' WHERE IP='{HikvisionHelper.m_deviceIp}'";
-                            OleDbHelper.ExcuteSql(sql);
+                            var sql1 = $"UPDATE NVRPara SET Port={Model.DevicePort},NVRName='{Model.DeviceName}',UserId='{Model.UserName}',pwd='{Model.Password}' WHERE IP='{HikvisionHelper.m_deviceIp}'";
+                            OleDbHelper.ExcuteSql(sql1);
                         }
                         else
                         {
@@ -198,8 +175,17 @@ namespace GZKL.Client.UI.ViewsModels
                     else
                     {
                         //新增
-                        sql = $"INSERT INTO NVRPara(NVRName,IP,Port,UserId,Psw) VALUES('{Model.DeviceName}','{Model.DeviceIp}',{Model.DevicePortOrChannelNo},'{Model.Password}')";
-                        OleDbHelper.ExcuteSql(sql);
+                        var sql2 = $"INSERT INTO NVRPara(NVRName,IP,Port,UserId,Psw) VALUES('{Model.DeviceName}','{Model.DeviceIp}',{Model.DevicePort},'{Model.Password}')";
+                        OleDbHelper.ExcuteSql(sql2);
+                    }
+                }
+
+                //获取主键ID
+                using (var dt = OleDbHelper.DataTable(sql))
+                {
+                    if (dt != null && dt.Rows.Count > 0)
+                    {
+                        nvrId = Convert.ToInt32(dt.Rows[0]["ID"]);
                     }
                 }
             }
@@ -262,7 +248,7 @@ namespace GZKL.Client.UI.ViewsModels
                             ID = Convert.ToInt32(dr["ID"]),
                             DeviceName = dr["NVRName"].ToString(),
                             DeviceIp = dr["IP"].ToString(),
-                            DeviceChannelNo = Convert.ToInt32(dr["Channel"]),
+                            ChannelNo = Convert.ToInt32(dr["Channel"]),
                             NVRID = Convert.ToInt32(dr["NVRID"])
                         });
                     }
@@ -275,7 +261,30 @@ namespace GZKL.Client.UI.ViewsModels
         /// </summary>
         private void ResetDevice()
         {
+            try
+            {
+                //校验是否登录状态？如果是，先执行登出操作
+                if (HikvisionHelper.m_lUserID >= 0)
+                {
+                    NET_DVR_Logout(HikvisionHelper.m_lUserID);
+                }
 
+                var sql = string.Empty;
+
+                //删除录像机配置
+                sql = "DELETE FROM NVRPara WHERE 1=1";
+                OleDbHelper.ExcuteSql(sql);
+
+                //删除摄像机配置
+                sql = "DELETE FROM DVRPara WHERE 1=1";
+                OleDbHelper.ExcuteSql(sql);
+
+                HandyControl.Controls.Growl.Info("清空成功");
+            }
+            catch (Exception ex)
+            {
+                HandyControl.Controls.Growl.Error(ex?.Message);
+            }
         }
 
         #endregion

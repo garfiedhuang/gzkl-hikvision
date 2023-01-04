@@ -8,17 +8,10 @@ namespace GZKL.Client.UI.Models
     public class DeviceModel : ObservableObject
     {
         /// <summary>
-        /// 设备类型 VR-录像机，CR-摄像机
-        /// </summary>
-        private string deviceType = "VR";
-        public string DeviceType { get { return deviceType; } set { deviceType = value; RaisePropertyChanged(); } }
-
-        /// <summary>
         /// 设备名称
         /// </summary>
         private string deviceName = "";
         public string DeviceName { get { return deviceName; } set { deviceName = value; RaisePropertyChanged(); } }
-
 
         /// <summary>
         /// 设备IP
@@ -26,12 +19,11 @@ namespace GZKL.Client.UI.Models
         private string deviceIp = "";
         public string DeviceIp { get { return deviceIp; } set { deviceIp = value; RaisePropertyChanged(); } }
 
-
         /// <summary>
-        /// 设备端口或设备通道号
+        /// 设备端口
         /// </summary>
-        private int devicePortOrChannelNo;
-        public int DevicePortOrChannelNo { get { return devicePortOrChannelNo; } set { devicePortOrChannelNo = value; RaisePropertyChanged(); } }
+        private int devicePort;
+        public int DevicePort { get { return devicePort; } set { devicePort = value; RaisePropertyChanged(); } }
 
         /// <summary>
         /// 用户名
@@ -68,7 +60,7 @@ namespace GZKL.Client.UI.Models
         public int ID { get; set; }
         public string DeviceName { get; set; }
         public string DeviceIp { get; set; }
-        public int DeviceChannelNo { get; set; }
+        public int ChannelNo { get; set; }
         public int NVRID { get; set; }
     }
 }

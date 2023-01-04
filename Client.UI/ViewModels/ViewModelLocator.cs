@@ -27,7 +27,7 @@ namespace GZKL.Client.UI.ViewsModels
 
         public HikvisionViewModel Main => SimpleIoc.Default.GetInstance<HikvisionViewModel>();
         public LoginViewModel Login => ServiceLocator.Current.GetInstance<LoginViewModel>();
-        public DeviceViewModel Home => ServiceLocator.Current.GetInstance<DeviceViewModel>();
+        public DeviceViewModel Device => ServiceLocator.Current.GetInstance<DeviceViewModel>();
 
         #region 系统管理
         public ConfigViewModel Config => ServiceLocator.Current.GetInstance<ConfigViewModel>();

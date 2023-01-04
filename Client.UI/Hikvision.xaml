@@ -111,8 +111,8 @@
                         <RowDefinition Height="*"></RowDefinition>
                     </Grid.RowDefinitions>
                     <StackPanel Grid.Row="0" Orientation="Horizontal" Background="LightGray" >
-                        <Button x:Name="btnDevice" Margin="10" Width="90" Content="设备管理" Command="{Binding DeviceCmd}" Click="btnDevice_Click"/>
-                        <Button x:Name="btnCheckTime" Margin="10" Width="90" Content="校时" Command="{Binding CheckTimeCmd}"/>
+                        <Button x:Name="btnDevice" Margin="10" Width="90" Content="设备管理" Click="btnDevice_Click"/>
+                        <Button x:Name="btnCheckTime" Margin="10" Width="90" Content="校时" Command="{Binding TimeSetCmd}"/>
                         <Button x:Name="btnRegister" Margin="10" Width="90" Content="软件注册" Command="{Binding RegisterCmd}"/>
                         <Button x:Name="btnExit" Margin="10" Width="90" Content="退出" Command="{Binding ExitCmd}"/>
                     </StackPanel>
@@ -126,9 +126,9 @@
                              IsEditable="False" 
                              hc:TitleElement.TitlePlacement="Left"
                              hc:InfoElement.Placeholder="请选择通道"
-                             DisplayMemberPath="ChannelName" 
+                             DisplayMemberPath="NVRName" 
                              SelectedValuePath="ChannelNo"
-                             ItemsSource="{Binding ChannelData}"
+                             ItemsSource="{Binding NvrData}"
                              SelectedValue="{Binding Model.ChannelNo,Mode=TwoWay}"
                              hc:InfoElement.Title="通道列表：" 
                              hc:InfoElement.Necessary="False">
