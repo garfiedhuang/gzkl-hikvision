@@ -110,6 +110,7 @@
     <Compile Include="Hikvision.xaml.cs">
       <DependentUpon>Hikvision.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Models\HikvisionModel.cs" />
     <Compile Include="Models\DeviceModel.cs" />
     <Compile Include="Models\LoginModel.cs" />
     <Compile Include="Models\ConfigModel.cs" />

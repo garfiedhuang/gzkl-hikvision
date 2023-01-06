@@ -43,6 +43,20 @@ namespace GZKL.Client.UI.ViewsModels
         #region =====data
 
         /// <summary>
+        /// 数据模型
+        /// </summary>
+        private HikvisionModel model;
+        public HikvisionModel Model
+        {
+            get { return model; }
+            set {
+                model = value;
+                RaisePropertyChanged();
+                HikvisionHelper.m_lChannel=Convert.ToInt32(value);//设置当前选中的通道
+            }
+        }
+
+        /// <summary>
         /// NVR模型
         /// </summary>
         private ObservableCollection<NvrData> nvrData;
@@ -255,6 +269,8 @@ namespace GZKL.Client.UI.ViewsModels
                     OleDbHelper.ExcuteSql(sql);
                 }
 
+                this.Model.IsRegister = false;
+
                 msg = $"当前电脑{SessionInfo.Instance.ComputerInfo.HostName}注册成功";
 
                 LogHelper.Info(msg);
@@ -288,7 +304,29 @@ namespace GZKL.Client.UI.ViewsModels
         /// </summary>
         public void StartShooting()
         {
+            try
+            {
+                if (string.IsNullOrEmpty(Model.ChannelNo))
+                {
+                    HandyControl.Controls.Growl.Warning("请选择通道列表！");
+                    return;
+                }
 
+                if (string.IsNullOrEmpty(Model.ShootingTestNo))
+                {
+                    HandyControl.Controls.Growl.Warning("请输入检测编号！");
+                    return;
+                }
+
+                //设置屏幕窗口显示的字符串
+
+
+
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error($"开始录像失败，{ex?.Message}");
+            }
         }
 
         /// <summary>
@@ -316,6 +354,11 @@ namespace GZKL.Client.UI.ViewsModels
                     var fullName = $"{SessionInfo.Instance.ComputerInfo.HostName}-{SessionInfo.Instance.ComputerInfo.CPU}";
 
                     SessionInfo.Instance.RegisterInfo = RegisterInfo.GetInstance().GetRegisterInfo(fullName);
+
+                    if (!string.IsNullOrEmpty(SessionInfo.Instance.RegisterInfo.RegCode))//已注册
+                    {
+                        this.Model.IsRegister = false;
+                    }
                 }
                 catch (Exception ex)
                 {

@@ -11,6 +11,7 @@ namespace GZKL.Client.UI.Common
         //登录相关参数
         public static bool m_bInitSDK = false;
         public static int m_lUserID = -1;//登录返回值
+        public static int m_lChannel;//当前选择通道
         public static string m_deviceIp;//设备IP
         public static int m_devicePort;//设备端口号
         public static string m_UserName;//登录用户名
@@ -25,6 +26,7 @@ namespace GZKL.Client.UI.Common
         public static NET_DVR_TIME m_struTimeCfg;
         public static NET_DVR_DEVICEINFO_V30 m_struDeviceInfo;
         public static NET_DVR_IPPARACFG_V40 m_struIpParaCfgV40;
+        public static NET_DVR_SHOWSTRING_V30 m_struShowStrCfg;
 
         //预览相关参数
         public static long lRealHandle;//预览句柄
@@ -248,7 +250,6 @@ namespace GZKL.Client.UI.Common
                 //设置时间失败，输出错误号 Failed to set the time of device and output the error code
 
                 LogHelper.Error(strErr);
-
                 HandyControl.Controls.Growl.Error(strErr);
             }
             else
@@ -259,7 +260,45 @@ namespace GZKL.Client.UI.Common
             Marshal.FreeHGlobal(ptrTimeCfg);
         }
 
-        //public static void 
+        /// <summary>
+        /// 设置显示字符
+        /// </summary>
+        /// <param name="testNo"></param>
+        public static void SetShowString(string testNo)
+        {
+            UInt32 dwReturn = 0;
+            Int32 nSize = Marshal.SizeOf(m_struShowStrCfg);
+            IntPtr ptrShowStrCfg = Marshal.AllocHGlobal(nSize);
+            Marshal.StructureToPtr(m_struShowStrCfg, ptrShowStrCfg, false);
+            if (!NET_DVR_GetDVRConfig(m_lUserID, NET_DVR_GET_SHOWSTRING_V30, m_lChannel, ptrShowStrCfg, (UInt32)nSize, ref dwReturn))
+            {
+                iLastErr = NET_DVR_GetLastError();
+                strErr = "NET_DVR_GET_SHOWSTRING_V30 failed, error code= " + iLastErr;
+                //获取字符叠加参数失败，输出错误号 Failed to get overlay parameters and output the error code
+
+                LogHelper.Error(strErr);
+                HandyControl.Controls.Growl.Error(strErr);
+            }
+            else
+            {
+                m_struShowStrCfg = (NET_DVR_SHOWSTRING_V30)Marshal.PtrToStructure(ptrShowStrCfg, typeof(NET_DVR_SHOWSTRING_V30));
+
+                m_struShowStrCfg.struStringInfo[0].wShowString = 1;
+                m_struShowStrCfg.struStringInfo[0].wStringSize = (ushort)testNo.Length;
+                m_struShowStrCfg.struStringInfo[0].sString = testNo;
+                m_struShowStrCfg.struStringInfo[0].wShowStringTopLeftX = 30;
+                m_struShowStrCfg.struStringInfo[0].wShowStringTopLeftY = 10;
+
+                m_struShowStrCfg.struStringInfo[1].wShowString = 0;
+                m_struShowStrCfg.struStringInfo[2].wShowString = 0;
+                m_struShowStrCfg.struStringInfo[3].wShowString = 0;
+                m_struShowStrCfg.struStringInfo[4].wShowString = 0;
+                m_struShowStrCfg.struStringInfo[5].wShowString = 0;
+                m_struShowStrCfg.struStringInfo[6].wShowString = 0;
+                m_struShowStrCfg.struStringInfo[7].wShowString = 0;
+            }
+            Marshal.FreeHGlobal(ptrShowStrCfg);
+        }
 
         public static void PlayBackTime(DateTime startTime, DateTime endTime, string dvrName)
         {
@@ -443,13 +482,13 @@ namespace GZKL.Client.UI.Common
                 string DVRUserName = nvrConfig.UserName;//设备登录用户名
                 string DVRPassword = nvrConfig.Password;//设备登录密码
 
-                //DeviceInfo = new CHCNetSDK.NET_DVR_DEVICEINFO_V30();
+                //DeviceInfo = new NET_DVR_DEVICEINFO_V30();
 
                 //登录设备 Login the device
-                m_lUserID = CHCNetSDK.NET_DVR_Login_V30(DVRIPAddress, DVRPortNumber, DVRUserName, DVRPassword, ref m_struDeviceInfo);
+                m_lUserID = NET_DVR_Login_V30(DVRIPAddress, DVRPortNumber, DVRUserName, DVRPassword, ref m_struDeviceInfo);
                 if (m_lUserID < 0)
                 {
-                    iLastErr = CHCNetSDK.NET_DVR_GetLastError();
+                    iLastErr = NET_DVR_GetLastError();
                     strErr = "NET_DVR_Login_V30 failed, error code= " + iLastErr; //登录失败，输出错误号
                     LogHelper.Error(strErr);
                     HandyControl.Controls.Growl.Error(strErr);
