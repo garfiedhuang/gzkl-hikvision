@@ -71,16 +71,6 @@ namespace GZKL.Client.UI.ViewsModels
             set { model = value; RaisePropertyChanged(); }
         }
 
-        /// <summary>
-        /// 用户名和密码可见性
-        /// </summary>
-        private Visibility userNameAndPasswordVisable;
-        public Visibility UserNameAndPasswordVisable
-        {
-            get { return userNameAndPasswordVisable; }
-            set { userNameAndPasswordVisable = value; RaisePropertyChanged(); }
-        }
-
         #endregion
 
         #region =====methods
@@ -88,7 +78,7 @@ namespace GZKL.Client.UI.ViewsModels
         /// <summary>
         /// 新增设备
         /// </summary>
-        private void AddDevice()
+        public void AddDevice()
         {
             var msg = string.Empty;
             var nvrId = 0;
@@ -129,7 +119,7 @@ namespace GZKL.Client.UI.ViewsModels
                 else
                 {
                     //初始化设备
-                    HikvisionHelper.InitDvrDevice(nvrId);
+                    HikvisionHelper.AddDvr(nvrId);
 
                     //刷新网格数据
                     this.QueryDevice();
@@ -145,7 +135,11 @@ namespace GZKL.Client.UI.ViewsModels
             }
         }
 
-
+        /// <summary>
+        /// 新增NVR
+        /// </summary>
+        /// <param name="nvrId"></param>
+        /// <returns></returns>
         public string AddNvr(out int nvrId)
         {
             var msg = string.Empty;
@@ -196,6 +190,9 @@ namespace GZKL.Client.UI.ViewsModels
             return msg;
         }
 
+        /// <summary>
+        /// 查询设备（NVR+DVR）
+        /// </summary>
         public void QueryDevice()
         {
             var sql = $"SELECT * FROM NVRPara WHERE 1=1";

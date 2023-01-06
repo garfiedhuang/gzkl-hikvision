@@ -1,12 +1,17 @@
+using CommonServiceLocator;
 using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Command;
 using GZKL.Client.UI.Models;
 using GZKL.Client.UI.Common;
 using System;
 using System.Threading.Tasks;
-using GalaSoft.MvvmLight.Command;
 using System.Collections.ObjectModel;
-using CommonServiceLocator;
-using System.IO;
+using System.Linq;
+using System.Data.SqlClient;
+using System.Data;
+using System.Text;
+using System.Windows;
+using System.Windows.Interop;
 
 namespace GZKL.Client.UI.ViewsModels
 {
@@ -30,6 +35,9 @@ namespace GZKL.Client.UI.ViewsModels
 
             //初始化DVR
             InitDvr();
+
+            //登录NVR
+            LoginDvr();
         }
 
         #region =====data
@@ -68,34 +76,18 @@ namespace GZKL.Client.UI.ViewsModels
 
         #endregion
 
-
-        /// <summary>
-        /// 获取电脑和注册数据
-        /// </summary>
-        private void GetPCAndRegisterData()
-        {
-            Task.Run(new Action(() =>
-            {
-                SessionInfo.Instance.ComputerInfo = ComputerInfo.GetInstance().ReadComputerInfo();
-
-                var fullName = $"{SessionInfo.Instance.ComputerInfo.HostName}-{SessionInfo.Instance.ComputerInfo.CPU}";
-
-                SessionInfo.Instance.RegisterInfo = RegisterInfo.GetInstance().GetRegisterInfo(fullName);
-            }));
-        }
-
         /// <summary>
         /// 初始化数据
         /// </summary>
         /// <param name="loginSuccessModel"></param>
-        private void InitData(LoginSuccessModel loginSuccessModel)
+        public void InitData(LoginSuccessModel loginSuccessModel)
         {
             try
             {
                 SessionInfo.Instance.UserInfo = loginSuccessModel.User;
 
-                //异步获取电脑配置和注册信息
-                GetPCAndRegisterData();
+                //异步获取应用信息：电脑配置和注册信息
+                this.GetAppInfo();
 
                 //加载录像机和摄像机配置
                 var deviceViewModel = ServiceLocator.Current.GetInstance<DeviceViewModel>();
@@ -116,70 +108,224 @@ namespace GZKL.Client.UI.ViewsModels
         /// </summary>
         public void InitDvr()
         {
-            HikvisionHelper.m_bInitSDK = CHCNetSDK.NET_DVR_Init();
-            if (HikvisionHelper.m_bInitSDK == false)
+            try
             {
-                LogHelper.Error($"NET_DVR_Init error!");
-                return;
+                HikvisionHelper.InitDvr();
             }
-            else
+            catch (Exception ex)
             {
-                var sdkLogPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SdkLog");
+                LogHelper.Error($"初始化DVR失败，{ex?.Message}");
+            }
+        }
 
-                //保存SDK日志
-                CHCNetSDK.NET_DVR_SetLogToFile(3, sdkLogPath, true);
+        /// <summary>
+        /// 登录DVR
+        /// </summary>
+        public void LoginDvr()
+        {
+            try
+            {
+                var nvrConfig = NvrData.FirstOrDefault();
+                if (nvrConfig != null)
+                {
+                    if (string.IsNullOrEmpty(nvrConfig.DeviceIp))
+                    {
+                        HandyControl.Controls.Growl.Warning("请先配置录像机设备IP！");
+                        return;
+                    }
+                    if (nvrConfig.DevicePort < 1)
+                    {
+                        HandyControl.Controls.Growl.Warning("请先配置录像机设备端口！");
+                        return;
+                    }
+                    if (string.IsNullOrEmpty(nvrConfig.UserName))
+                    {
+                        HandyControl.Controls.Growl.Warning("请先配置录像机用户名！");
+                        return;
+                    }
+                    if (string.IsNullOrEmpty(nvrConfig.Password))
+                    {
+                        HandyControl.Controls.Growl.Warning("请先配置录像机密码！");
+                        return;
+                    }
+                    HikvisionHelper.LoginDvr(nvrConfig);
+                }
+                else
+                {
+                    HandyControl.Controls.Growl.Warning("请先配置录像机设备！");
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error($"登录NVR失败，{ex?.Message}");
             }
         }
 
         /// <summary>
         /// 退出
         /// </summary>
-        private void Exit()
+        public void Exit()
         {
-            //停止回放 Stop playback
-            if (HikvisionHelper.m_lPlayHandle >= 0)
+            try
             {
-                CHCNetSDK.NET_DVR_StopPlayBack(HikvisionHelper.m_lPlayHandle);
-                HikvisionHelper.m_lPlayHandle = -1;
-            }
+                HikvisionHelper.LogoutDvr();
 
-            //停止下载 Stop download
-            if (HikvisionHelper.m_lDownHandle >= 0)
+                HikvisionHelper.Dispose();
+
+                Environment.Exit(0);//强制退出
+            }
+            catch (Exception ex)
             {
-                CHCNetSDK.NET_DVR_StopGetFile(HikvisionHelper.m_lDownHandle);
-                HikvisionHelper.m_lDownHandle = -1;
+                LogHelper.Error($"退出失败，{ex?.Message}");
             }
+        }
 
-            //注销登录 Logout the device
-            if (HikvisionHelper.m_lUserID >= 0)
+        /// <summary>
+        /// 注册
+        /// </summary>
+        public void Register()
+        {
+            try
             {
-                CHCNetSDK.NET_DVR_Logout(HikvisionHelper.m_lUserID);
-                HikvisionHelper.m_lUserID = -1;
+                string msg = string.Empty;
+                string fullName = $"{SessionInfo.Instance.ComputerInfo.HostName}-{SessionInfo.Instance.ComputerInfo.CPU}";
+
+                if (string.IsNullOrEmpty(fullName))
+                {
+                    msg = "电脑信息读取失败，请稍后再试！";
+                    LogHelper.Warn(msg);
+                    HandyControl.Controls.Growl.Warning(msg);
+
+                    return;
+                }
+
+                string sql = "";
+                int rowCount = 0;
+
+                //判断是否存在注册信息？
+                sql = $"SELECT COUNT(1) FROM [sys_config] WHERE [category]='System-{fullName}' AND [value]='Register' AND [is_deleted]=0";
+
+                rowCount = Convert.ToInt32(OleDbHelper.ExecuteScalar(sql) ?? "0");
+
+                if (rowCount > 0)
+                {
+                    msg = $"当前电脑【{fullName}】已存在注册记录，请勿重复注册";
+                    LogHelper.Warn(msg);
+                    HandyControl.Controls.Growl.Warning(msg);
+
+                    return;
+                }
+
+                var registerCode = SecurityHelper.DESEncrypt(fullName);
+                var registerTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+                var value = string.Empty;
+                var text = string.Empty;
+                var remark = string.Empty;
+
+                //注册信息写入数据库
+                sql = @"INSERT INTO [sys_config]
+           ([category],[value],[text],[remark],[is_deleted],[create_dt],[create_user_id],[update_dt],[update_user_id])
+     VALUES
+           ({0},{1},{2},{3},0,Now(),{4},Now(),{4})";
+
+                for (var i = 0; i < 3; i++)
+                {
+                    switch (i)
+                    {
+                        case 0:
+                            value = "Register";
+                            text = registerCode;
+                            remark = registerTime;
+                            break;
+                        case 1:
+                            value = "HostName";
+                            text = SessionInfo.Instance.ComputerInfo.HostName;
+                            remark = "系统信息";
+                            break;
+                        case 2:
+                            value = "CPU";
+                            text = SessionInfo.Instance.ComputerInfo.CPU;
+                            remark = "系统信息";
+                            break;
+                    }
+
+                    sql = string.Format(sql, $"System-{fullName}", value, text, remark, SessionInfo.Instance.UserInfo.Id);
+
+                    OleDbHelper.ExcuteSql(sql);
+                }
+
+                msg = $"当前电脑{SessionInfo.Instance.ComputerInfo.HostName}注册成功";
+
+                LogHelper.Info(msg);
+                HandyControl.Controls.Growl.Info(msg);
+
             }
-
-            //退出整个程序
-            Environment.Exit(0);
+            catch (Exception ex)
+            {
+                LogHelper.Error(ex?.Message);
+                HandyControl.Controls.Growl.Error(ex?.Message);
+            }
         }
 
-        private void Register()
+        /// <summary>
+        /// 校时
+        /// </summary>
+        public void TimeSet()
         {
-            throw new NotImplementedException();
+            try
+            {
+                HikvisionHelper.TimeSet();
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error($"校时失败，{ex?.Message}");
+            }
         }
 
-        private void TimeSet()
+        /// <summary>
+        /// 开始录像
+        /// </summary>
+        public void StartShooting()
         {
-            throw new NotImplementedException();
+
         }
 
-
-        private void StopShooting()
+        /// <summary>
+        /// 结束录像
+        /// </summary>
+        public void StopShooting()
         {
-            throw new NotImplementedException();
+
         }
 
-        private void StartShooting()
+
+        #region 私有方法
+
+        /// <summary>
+        /// 获取应用信息
+        /// </summary>
+        private void GetAppInfo()
         {
-            throw new NotImplementedException();
+            Task.Run(new Action(() =>
+            {
+                try
+                {
+                    SessionInfo.Instance.ComputerInfo = ComputerInfo.GetInstance().ReadComputerInfo();
+
+                    var fullName = $"{SessionInfo.Instance.ComputerInfo.HostName}-{SessionInfo.Instance.ComputerInfo.CPU}";
+
+                    SessionInfo.Instance.RegisterInfo = RegisterInfo.GetInstance().GetRegisterInfo(fullName);
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.Error($"获取应用信息失败，{ex?.Message}");
+                }
+            }));
         }
+
+
+        #endregion
+
     }
 }

@@ -3,7 +3,6 @@ using GZKL.Client.UI.Models;
 using System.Windows;
 using System.Windows.Input;
 using GZKL.Client.UI.Views.SystemMgt.Device;
-using GZKL.Client.UI.Common;
 
 namespace GZKL.Client.UI
 {
@@ -16,10 +15,8 @@ namespace GZKL.Client.UI
         {
             InitializeComponent();
 
-            this.tbTitle.Text = $"XXXXXX系统({GetEdition()})";
-
+            this.tbTitle.Text = $"广州昆仑录像检测系统({GetEdition()})";
             this.DataContext = new HikvisionViewModel(loginSuccessModel);
-
         }
 
         public static string GetEdition()
@@ -46,7 +43,11 @@ namespace GZKL.Client.UI
 
         private void CloseWin_click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            var viewModel = this.DataContext as HikvisionViewModel;
+
+            viewModel.Exit();
+
+            //this.Close();
         }
 
         private void btnDevice_Click(object sender, RoutedEventArgs e)
@@ -54,11 +55,6 @@ namespace GZKL.Client.UI
             var window = new Device();
             window.Owner = Application.Current.MainWindow;
             window.ShowDialog();
-        }
-
-        private void btnCheckTime_Click(object sender, RoutedEventArgs e)
-        {
-
         }
     }
 }

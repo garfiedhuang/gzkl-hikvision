@@ -135,7 +135,7 @@
                         <DataGrid Margin="5" 
                                           Background="White"
                                           x:Name="dgNvrData"
-                                          ItemsSource="{Binding Model.NvrData}" >
+                                          ItemsSource="{Binding NvrData}" >
 
                             <DataGrid.Columns>
                                 <DataGridTextColumn IsReadOnly="True" MinWidth="60" Binding="{Binding Id}" Header="ID"/>
@@ -151,7 +151,7 @@
                         <DataGrid Margin="5" 
                                           Background="White"
                                           x:Name="dgDvrData" 
-                                          ItemsSource="{Binding Model.DvrData}" >
+                                          ItemsSource="{Binding DvrData}" >
 
                             <DataGrid.Columns>
                                 <DataGridTextColumn IsReadOnly="True" MinWidth="60" Binding="{Binding Id}" Header="ID"/>

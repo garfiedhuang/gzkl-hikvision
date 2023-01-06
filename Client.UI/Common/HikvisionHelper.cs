@@ -1,6 +1,7 @@
-﻿using System;
+﻿using GZKL.Client.UI.Models;
+using System;
+using System.IO;
 using System.Runtime.InteropServices;
-using System.Windows.Interop;
 using static GZKL.Client.UI.Common.CHCNetSDK;
 
 namespace GZKL.Client.UI.Common
@@ -10,9 +11,8 @@ namespace GZKL.Client.UI.Common
         //登录相关参数
         public static bool m_bInitSDK = false;
         public static int m_lUserID = -1;//登录返回值
-        public static string m_deviceIp = "";//设备IP
+        public static string m_deviceIp;//设备IP
         public static int m_devicePort;//设备端口号
-
         public static string m_UserName;//登录用户名
         public static string m_Password;//登录密码
 
@@ -28,9 +28,8 @@ namespace GZKL.Client.UI.Common
 
         //预览相关参数
         public static long lRealHandle;//预览句柄
-        public static NET_DVR_CLIENTINFO struPlayInfo;//预览参数
+        public static NET_DVR_CLIENTINFO struPlayInfo;
         public static NET_DVR_PREVIEWINFO lpPreviewInfo;
-
 
         //回放开始时间点
         //public static NET_DVR_TIME playBackStartTime;
@@ -62,16 +61,15 @@ namespace GZKL.Client.UI.Common
         }
 
         /// <summary>
-        /// 设置IP摄像机
+        /// 保存IP摄像机
         /// </summary>
         /// <param name="nvrId"></param>
         /// <param name="sIp"></param>
         /// <param name="sChannel"></param>
-        public static void SetIPDVR(int nvrId,string sIp,string sChannel)
+        public static void SaveIpDVR(int nvrId, string sIp, string sChannel)
         {
             try
             {
-
                 var sql = $"SELECT * FROM DVRPara WHERE 1=1 WHERE NVRID={nvrId} AND IP='{sIp}'";
                 using (var dt = OleDbHelper.DataTable(sql))
                 {
@@ -99,10 +97,10 @@ namespace GZKL.Client.UI.Common
         }
 
         /// <summary>
-        /// 初始化摄像机设备
+        /// 新增DVR
         /// </summary>
         /// <param name="nvrId"></param>
-        public static void InitDvrDevice(int nvrId)
+        public static void AddDvr(int nvrId)
         {
             if (m_lUserID < 0)
             {
@@ -150,7 +148,7 @@ namespace GZKL.Client.UI.Common
                         m_struChanNoInfo.lChannelNo[j] = i + m_struDeviceInfo.byStartChan;
                         j++;
 
-                        SetIPDVR(nvrId, sIp, sChannel);
+                        SaveIpDVR(nvrId, sIp, sChannel);
                     }
                 }
 
@@ -189,7 +187,7 @@ namespace GZKL.Client.UI.Common
                                 m_struChanNoInfo.lChannelNo[j] = i + (int)m_struIpParaCfgV40.dwStartDChan;
                                 j++;
 
-                                SetIPDVR(nvrId, sIp, sChannel);
+                                SaveIpDVR(nvrId, sIp, sChannel);
                             }
                             Marshal.FreeHGlobal(ptrChanInfo);
                             break;
@@ -208,7 +206,7 @@ namespace GZKL.Client.UI.Common
                                 m_struChanNoInfo.lChannelNo[j] = i + (int)m_struIpParaCfgV40.dwStartDChan;
                                 j++;
 
-                                SetIPDVR(nvrId, sIp, sChannel);
+                                SaveIpDVR(nvrId, sIp, sChannel);
                             }
                             Marshal.FreeHGlobal(ptrChanInfoV40);
                             break;
@@ -414,5 +412,90 @@ namespace GZKL.Client.UI.Common
         }
 
 
+        /// <summary>
+        /// 初始化DVR
+        /// </summary>
+        public static void InitDvr()
+        {
+            m_bInitSDK = NET_DVR_Init();
+            if (m_bInitSDK == false)
+            {
+                strErr = $"NET_DVR_Init error!";
+                LogHelper.Error(strErr);
+                HandyControl.Controls.Growl.Error(strErr);
+                return;
+            }
+            else
+            {
+                var sdkLogPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SdkLog");
+
+                //保存SDK日志
+                NET_DVR_SetLogToFile(3, sdkLogPath, true);
+            }
+        }
+
+        internal static void LoginDvr(NvrData nvrConfig)
+        {
+            if (m_lUserID < 0)
+            {
+                string DVRIPAddress = nvrConfig.DeviceIp; //设备IP地址或者域名
+                Int16 DVRPortNumber = Convert.ToInt16(nvrConfig.DevicePort);//设备服务端口号
+                string DVRUserName = nvrConfig.UserName;//设备登录用户名
+                string DVRPassword = nvrConfig.Password;//设备登录密码
+
+                //DeviceInfo = new CHCNetSDK.NET_DVR_DEVICEINFO_V30();
+
+                //登录设备 Login the device
+                m_lUserID = CHCNetSDK.NET_DVR_Login_V30(DVRIPAddress, DVRPortNumber, DVRUserName, DVRPassword, ref m_struDeviceInfo);
+                if (m_lUserID < 0)
+                {
+                    iLastErr = CHCNetSDK.NET_DVR_GetLastError();
+                    strErr = "NET_DVR_Login_V30 failed, error code= " + iLastErr; //登录失败，输出错误号
+                    LogHelper.Error(strErr);
+                    HandyControl.Controls.Growl.Error(strErr);
+                    return;
+                }
+                else
+                {
+                    //登录成功
+                    AddDvr(nvrConfig.ID);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 登出
+        /// </summary>
+        public static void LogoutDvr()
+        {
+            //停止回放 Stop playback
+            if (m_lPlayHandle >= 0)
+            {
+                NET_DVR_StopPlayBack(m_lPlayHandle);
+                m_lPlayHandle = -1;
+            }
+
+            //停止下载 Stop download
+            if (m_lDownHandle >= 0)
+            {
+                NET_DVR_StopGetFile(m_lDownHandle);
+                m_lDownHandle = -1;
+            }
+
+            //注销登录 Logout the device
+            if (m_lUserID >= 0)
+            {
+                NET_DVR_Logout(m_lUserID);
+                m_lUserID = -1;
+            }
+        }
+
+        /// <summary>
+        /// 释放SDK资源
+        /// </summary>
+        public static void Dispose()
+        {
+            NET_DVR_Cleanup();
+        }
     }
 }
