@@ -97,10 +97,9 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"></RowDefinition>
                     </Grid.RowDefinitions>
-                    <hc:SimplePanel Grid.Row="0" Background="Black">
-
-                        <ProgressBar Height="20" Value="77.78" Margin="0" VerticalAlignment="Bottom"/>
-                        
+                    <hc:SimplePanel Grid.Row="0">
+                        <MediaElement x:Name="mePreview" Stretch="Fill"/>
+                        <ProgressBar Height="20" Value="{Binding Model.ProgressBarValue}" VerticalAlignment="Bottom"/>
                     </hc:SimplePanel>
                 </Grid>
                 <Grid x:Name="gdFour" Grid.Column="1">

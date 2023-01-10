@@ -45,7 +45,16 @@ namespace GZKL.Client.UI.Models
         {
             get { return testNo; }
             set { testNo = value; RaisePropertyChanged(); }
-        }
+        }    
 
+        /// <summary>
+        /// 进度条值
+        /// </summary>
+        private float progressBarValue = 0;
+        public float ProgressBarValue
+        {
+            get { return progressBarValue; }
+            set { progressBarValue = value; RaisePropertyChanged(); }
+        }
     }
 }

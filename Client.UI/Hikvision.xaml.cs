@@ -3,6 +3,7 @@ using GZKL.Client.UI.Models;
 using System.Windows;
 using System.Windows.Input;
 using GZKL.Client.UI.Views.SystemMgt.Device;
+using HandyControl.Tools;
 
 namespace GZKL.Client.UI
 {

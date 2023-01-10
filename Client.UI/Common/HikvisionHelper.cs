@@ -36,11 +36,13 @@ namespace GZKL.Client.UI.Common
         //回放开始时间点
         //public static NET_DVR_TIME playBackStartTime;
         //public static int[] iChannelNum=new int[64];
+        public static REALDATACALLBACK RealData = null;
 
         //回放下载相关参数
         public static Int32 m_lFindHandle = -1;
         public static Int32 m_lPlayHandle = -1;
         public static Int32 m_lDownHandle = -1;
+        public static Int32 m_lRealHandle = -1;
 
         public static bool m_bPause = false;
         public static bool m_bReverse = false;
@@ -87,6 +89,10 @@ namespace GZKL.Client.UI.Common
                         sql = $"INSERT INTO DVRPara(DVRName,IP,Channel,NVRID) VALUES('通道{sChannel}摄像机','{sIp}',{sChannel},'{nvrId}')";
                         OleDbHelper.ExcuteSql(sql);
                     }
+
+                    //Todo：触发实时预览 by garfield 20230110
+
+
                 }
             }
             catch (Exception ex)
@@ -300,6 +306,100 @@ namespace GZKL.Client.UI.Common
             Marshal.FreeHGlobal(ptrShowStrCfg);
         }
 
+        /// <summary>
+        /// 实时预览
+        /// </summary>
+        internal static void Preview()
+        {
+            if (m_lUserID < 0)
+            {
+                strErr = "Please login the device firstly";
+                LogHelper.Warn(strErr);
+                HandyControl.Controls.Growl.Warning(strErr);
+                return;
+            }
+
+            if (m_lRealHandle < 0)
+            {
+                NET_DVR_PREVIEWINFO lpPreviewInfo = new NET_DVR_PREVIEWINFO();
+
+                //lpPreviewInfo.hPlayWnd = RealPlayWnd.Handle;//预览窗口
+
+                lpPreviewInfo.lChannel = m_lChannel;//预览的设备通道
+                lpPreviewInfo.dwStreamType = 0;//码流类型：0-主码流，1-子码流，2-码流3，3-码流4，以此类推
+                lpPreviewInfo.dwLinkMode = 0;//连接方式：0- TCP方式，1- UDP方式，2- 多播方式，3- RTP方式，4-RTP/RTSP，5-RSTP/HTTP 
+                lpPreviewInfo.bBlocked = true; //0- 非阻塞取流，1- 阻塞取流
+                lpPreviewInfo.dwDisplayBufNum = 15; //播放库播放缓冲区最大缓冲帧数
+                lpPreviewInfo.byProtoType = 0;
+                lpPreviewInfo.byPreviewMode = 0;
+
+                //if (textBoxID.Text != "")
+                //{
+                //    lpPreviewInfo.lChannel = -1;
+                //    byte[] byStreamID = System.Text.Encoding.Default.GetBytes(textBoxID.Text);
+                //    lpPreviewInfo.byStreamID = new byte[32];
+                //    byStreamID.CopyTo(lpPreviewInfo.byStreamID, 0);
+                //}
+
+                if (RealData == null)
+                {
+                    RealData = new REALDATACALLBACK(RealDataCallBack);//预览实时流回调函数
+                }
+
+                IntPtr pUser = new IntPtr();//用户数据
+
+                //打开预览 Start live view 
+                m_lRealHandle = NET_DVR_RealPlay_V40(m_lUserID, ref lpPreviewInfo, null/*RealData*/, pUser);
+                if (m_lRealHandle < 0)
+                {
+                    iLastErr = NET_DVR_GetLastError();
+                    strErr = "NET_DVR_RealPlay_V40 failed, error code= " + iLastErr; //预览失败，输出错误号
+
+                    LogHelper.Error(strErr);
+                    HandyControl.Controls.Growl.Error(strErr);
+                    return;
+                }
+                else
+                {
+                    strErr = "预览成功";
+                    LogHelper.Info(strErr);
+                    HandyControl.Controls.Growl.Info(strErr);
+                }
+            }
+            else
+            {
+                //停止预览 Stop live view 
+                if (!NET_DVR_StopRealPlay(m_lRealHandle))
+                {
+                    iLastErr = NET_DVR_GetLastError();
+                    strErr = "NET_DVR_StopRealPlay failed, error code= " + iLastErr;
+
+                    LogHelper.Error(strErr);
+                    HandyControl.Controls.Growl.Error(strErr);
+                    return;
+                }
+                m_lRealHandle = -1;
+                //btnPreview.Text = "Live View";
+
+            }
+        }
+
+        public static void RealDataCallBack(Int32 lRealHandle, UInt32 dwDataType, IntPtr pBuffer, UInt32 dwBufSize, IntPtr pUser)
+        {
+            if (dwBufSize > 0)
+            {
+                byte[] sData = new byte[dwBufSize];
+                Marshal.Copy(pBuffer, sData, 0, (Int32)dwBufSize);
+
+                string str = "实时流数据.ps";
+                FileStream fs = new FileStream(str, FileMode.Create);
+                int iLen = (int)dwBufSize;
+                fs.Write(sData, 0, iLen);
+                fs.Close();
+            }
+        }
+
+
         public static void PlayBackTime(DateTime startTime, DateTime endTime, string dvrName)
         {
             if (m_lPlayHandle >= 0)
@@ -451,6 +551,9 @@ namespace GZKL.Client.UI.Common
         }
 
 
+
+
+
         /// <summary>
         /// 初始化DVR
         /// </summary>
@@ -473,6 +576,10 @@ namespace GZKL.Client.UI.Common
             }
         }
 
+        /// <summary>
+        /// 登录DVR
+        /// </summary>
+        /// <param name="nvrConfig"></param>
         internal static void LoginDvr(NvrData nvrConfig)
         {
             if (m_lUserID < 0)
@@ -524,7 +631,8 @@ namespace GZKL.Client.UI.Common
             //注销登录 Logout the device
             if (m_lUserID >= 0)
             {
-                NET_DVR_Logout(m_lUserID);
+                //NET_DVR_Logout(m_lUserID);
+                NET_DVR_Logout_V30(m_lUserID);
                 m_lUserID = -1;
             }
         }

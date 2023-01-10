@@ -319,6 +319,7 @@ namespace GZKL.Client.UI.ViewsModels
                 }
 
                 //设置屏幕窗口显示的字符串
+                HikvisionHelper.SetShowString(Model.ShootingTestNo);
 
 
 
