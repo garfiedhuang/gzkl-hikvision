@@ -1,4 +1,5 @@
 ﻿using GalaSoft.MvvmLight;
+using System;
 
 namespace GZKL.Client.UI.Models
 {
@@ -45,7 +46,17 @@ namespace GZKL.Client.UI.Models
         {
             get { return testNo; }
             set { testNo = value; RaisePropertyChanged(); }
-        }    
+        }
+
+        /// <summary>
+        /// 预览窗口控件
+        /// </summary>
+        private IntPtr mePreview;
+        public IntPtr MePreview
+        {
+            get { return mePreview; }
+            set { mePreview = value; RaisePropertyChanged(); }
+        }
 
         /// <summary>
         /// 进度条值

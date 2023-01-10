@@ -129,6 +129,7 @@
                              SelectedValuePath="ChannelNo"
                              ItemsSource="{Binding DvrData}"
                              SelectedValue="{Binding Model.ChannelNo,Mode=TwoWay}"
+                              SelectionChanged="cmbShootingChannel_SelectionChanged"
                              hc:InfoElement.Title="通道列表：" 
                              hc:InfoElement.Necessary="False">
                                 </hc:ComboBox>

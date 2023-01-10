@@ -309,7 +309,8 @@ namespace GZKL.Client.UI.Common
         /// <summary>
         /// 实时预览
         /// </summary>
-        internal static void Preview()
+        /// <param name="handle"></param>
+        internal static void Preview(IntPtr handle)
         {
             if (m_lUserID < 0)
             {
@@ -323,7 +324,7 @@ namespace GZKL.Client.UI.Common
             {
                 NET_DVR_PREVIEWINFO lpPreviewInfo = new NET_DVR_PREVIEWINFO();
 
-                //lpPreviewInfo.hPlayWnd = RealPlayWnd.Handle;//预览窗口
+                lpPreviewInfo.hPlayWnd = handle;//预览窗口
 
                 lpPreviewInfo.lChannel = m_lChannel;//预览的设备通道
                 lpPreviewInfo.dwStreamType = 0;//码流类型：0-主码流，1-子码流，2-码流3，3-码流4，以此类推

@@ -4,6 +4,8 @@ using System.Windows;
 using System.Windows.Input;
 using GZKL.Client.UI.Views.SystemMgt.Device;
 using HandyControl.Tools;
+using GZKL.Client.UI.Common;
+using System;
 
 namespace GZKL.Client.UI
 {
@@ -56,6 +58,16 @@ namespace GZKL.Client.UI
             var window = new Device();
             window.Owner = Application.Current.MainWindow;
             window.ShowDialog();
+        }
+
+        private void cmbShootingChannel_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            var selectedValue = this.cmbShootingChannel.SelectedValue.ToString();
+            if (!string.IsNullOrEmpty(selectedValue))
+            {
+                HikvisionHelper.m_lChannel = Convert.ToInt32(selectedValue);
+                HikvisionHelper.Preview(this.mePreview.GetHandle());
+            }
         }
     }
 }
