@@ -19087,6 +19087,35 @@ namespace GZKL.Client.UI.Common
         [DllImport(@".\HCNetSDK.dll")]
         public static extern bool NET_DVR_StopSaveRealData(Int32 lRealHandle);
 
+
+        /*****************新加方法：Add by garfield 20230111 => start *****************/
+
+        /*
+
+        function NET_DVR_InsertRecordLabel(lPlayHandle:longInt;lpRecordLabel: LpNET_DVR_RECORD_LABEL ;  lpLableIdentify: LPNET_DVR_LABEL_IDENTIFY):  BOOL ;stdcall;external 'HCNetSDK.dll'
+        function NET_DVR_FindRecordLabel(lUserID : longint; lpFindLabel: LPNET_DVR_FIND_LABEL): Longint; stdcall; external 'HCNetSDK.dll';
+
+        function NET_DVR_FindNextLabel(lFindHandle : longint; lpFindData: LPNET_DVR_FINDLABEL_DATA ): Longint; stdcall; external 'HCNetSDK.dll';
+        function NET_DVR_StopFindLabel(lFindHandle : longint):  BOOL ;stdcall;external 'HCNetSDK.dll'
+
+        */
+
+        [DllImport(@".\HCNetSDK.dll")]
+        public static extern bool NET_DVR_InsertRecordLabel(Int32 lPlayHandle, NET_DVR_RECORD_LABEL struRecordLabel,ref NET_DVR_LABEL_IDENTIFY struLabelIdentify);
+
+        [DllImport(@".\HCNetSDK.dll")]
+        public static extern int NET_DVR_FindRecordLabel(Int32 lUserID, NET_DVR_FINDLABEL_DATA struFindLabel);
+
+        [DllImport(@".\HCNetSDK.dll")]
+        public static extern int NET_DVR_FindNextLabel(Int32 lFindHandle, NET_DVR_FINDLABEL_DATA struFindLabelData);
+
+        [DllImport(@".\HCNetSDK.dll")]
+        public static extern bool NET_DVR_StopFindLabel(Int32 lFindHandle);
+
+
+        /*****************新加方法：Add by garfield 20230111 => end *****************/
+
+
         /*********************************************************
         Function:	REALDATACALLBACK
         Desc:		(回调函数)

@@ -129,7 +129,7 @@
                              SelectedValuePath="ChannelNo"
                              ItemsSource="{Binding DvrData}"
                              SelectedValue="{Binding Model.ChannelNo,Mode=TwoWay}"
-                              SelectionChanged="cmbShootingChannel_SelectionChanged"
+                             SelectionChanged="cmbShootingChannel_SelectionChanged"
                              hc:InfoElement.Title="通道列表：" 
                              hc:InfoElement.Necessary="False">
                                 </hc:ComboBox>
@@ -143,8 +143,8 @@
                             hc:InfoElement.Necessary="False"/>
 
                                 <WrapPanel Margin="2" Width="280">
-                                    <Button x:Name="btnStartShooting" Margin="10" Width="120" Content="开始录像" Command="{Binding StartShootingCmd}"/>
-                                    <Button x:Name="btnStopShooting" Margin="10" Width="120" Content="停止录像" Command="{Binding StopShootingCmd}"/>
+                                    <Button x:Name="btnStartShooting" Margin="10" Width="120" Content="开始录像" Click="btnStartShooting_Click"/>
+                                    <Button x:Name="btnStopShooting" Margin="10" Width="120" Content="停止录像" Click="btnStopShooting_Click"/>
                                 </WrapPanel>
                             </StackPanel>
                         </GroupBox>

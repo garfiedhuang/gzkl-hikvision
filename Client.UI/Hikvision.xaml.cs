@@ -69,5 +69,60 @@ namespace GZKL.Client.UI
                 HikvisionHelper.Preview(this.mePreview.GetHandle());
             }
         }
+
+        /// <summary>
+        /// 开始录像
+        /// </summary>
+        private void btnStartShooting_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(this.cmbShootingChannel.SelectedValue.ToString()))
+                {
+                    HandyControl.Controls.Growl.Warning("请选择通道列表！");
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(this.txtShootingTestNo.Text))
+                {
+                    HandyControl.Controls.Growl.Warning("请输入检测编号！");
+                    return;
+                }
+
+                //设置屏幕窗口显示的字符串
+                HikvisionHelper.SetShowString(this.txtShootingTestNo.Text);
+
+                //开始录制视频
+                HikvisionHelper.StartDvrRecord();
+
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error($"开始录像失败，{ex?.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 结束录像
+        /// </summary>
+        private void btnStopShooting_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                //设置屏幕窗口显示的字符串
+                HikvisionHelper.SetShowString(string.Empty);
+
+                //停止录制视频
+                var testNo =this.txtShootingTestNo.Text.Trim();
+                var nvrName = this.cmbShootingChannel.SelectedItem.ToString();
+                var intPtr = this.mePreview.GetHandle();
+
+                HikvisionHelper.StopDvrRecord(testNo,nvrName, intPtr);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error($"停止录像失败，{ex?.Message}");
+            }
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using GZKL.Client.UI.Models;
 using System;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using static GZKL.Client.UI.Common.CHCNetSDK;
 
@@ -47,6 +48,9 @@ namespace GZKL.Client.UI.Common
         public static bool m_bPause = false;
         public static bool m_bReverse = false;
         public static bool m_bSound = false;
+
+        public static DateTime _startRecordTime = DateTime.MinValue;//开始录制时间
+        public static DateTime _endRecordTime = DateTime.MinValue;//结束录制时间
 
 
         public static CHAN_INFO m_struChanNoInfo = new CHAN_INFO();
@@ -385,7 +389,7 @@ namespace GZKL.Client.UI.Common
             }
         }
 
-        public static void RealDataCallBack(Int32 lRealHandle, UInt32 dwDataType, IntPtr pBuffer, UInt32 dwBufSize, IntPtr pUser)
+        internal static void RealDataCallBack(Int32 lRealHandle, UInt32 dwDataType, IntPtr pBuffer, UInt32 dwBufSize, IntPtr pUser)
         {
             if (dwBufSize > 0)
             {
@@ -400,8 +404,171 @@ namespace GZKL.Client.UI.Common
             }
         }
 
+        /// <summary>
+        /// 开始远程录制视频
+        /// </summary>
+        internal static void StartDvrRecord()
+        {
+            if (m_lUserID < 0)
+            {
+                strErr = "Please login the device firstly";
+                LogHelper.Warn(strErr);
+                HandyControl.Controls.Growl.Warning(strErr);
+                return;
+            }
 
-        public static void PlayBackTime(DateTime startTime, DateTime endTime, string dvrName)
+            if (!NET_DVR_StartDVRRecord(m_lUserID, m_lChannel, 0))
+            {
+                iLastErr = NET_DVR_GetLastError();
+                strErr = "NET_DVR_StartDVRRecord failed, error code= " + iLastErr;
+
+                LogHelper.Error(strErr);
+                HandyControl.Controls.Growl.Error(strErr);
+                return;
+            }
+            else
+            {
+                uint dwSize = (uint)Marshal.SizeOf(m_struTimeCfg);//非托管对象大小，单位字节
+                IntPtr ptrGetTimeCfg = Marshal.AllocHGlobal((Int32)dwSize);//从进程中的非托管内存分配内存
+                Marshal.StructureToPtr(m_struTimeCfg, ptrGetTimeCfg, false);//将数据从托管对象封送到非托管内存块
+
+                uint dwReturn = 0;
+
+                //获取DVR时间设置
+                if (!NET_DVR_GetDVRConfig(m_lUserID, NET_DVR_GET_TIMECFG, m_lChannel, ptrGetTimeCfg, dwSize, ref dwReturn))
+                {
+                    iLastErr = NET_DVR_GetLastError();
+                    strErr = $"获取NET_DVR_GET_TIMECFG失败, 错误号为：{iLastErr}";
+                    LogHelper.Error(strErr);
+
+                    HandyControl.Controls.Growl.Error(strErr);
+                }
+                else
+                {
+                    //开始录制时间
+                    var _startRecordTime = new DateTime(m_struTimeCfg.dwYear, m_struTimeCfg.dwMonth, m_struTimeCfg.dwDay, m_struTimeCfg.dwHour, m_struTimeCfg.dwMinute, m_struTimeCfg.dwSecond);
+
+                    //回放开始时间
+                    //m_struTimeCfg
+                }
+            }
+        }
+
+        /// <summary>
+        /// 停止远程录制视频
+        /// </summary>
+        /// <param name="testNo"></param>
+        /// <param name="dvrName"></param>
+        /// <param name="intPtr"></param>
+        internal static void StopDvrRecord(string testNo, string dvrName, IntPtr intPtr)
+        {
+            if (m_lUserID < 0)
+            {
+                strErr = "Please login the device firstly";
+                LogHelper.Warn(strErr);
+                HandyControl.Controls.Growl.Warning(strErr);
+                return;
+            }
+
+            if (!NET_DVR_StopDVRRecord(m_lUserID, m_lChannel))
+            {
+                iLastErr = NET_DVR_GetLastError();
+                strErr = "NET_DVR_StopDVRRecord failed, error code= " + iLastErr;
+
+                LogHelper.Error(strErr);
+                HandyControl.Controls.Growl.Error(strErr);
+                return;
+            }
+            else
+            {
+                uint dwSize = (uint)Marshal.SizeOf(m_struTimeCfg);//非托管对象大小，单位字节
+                IntPtr ptrGetTimeCfg = Marshal.AllocHGlobal((Int32)dwSize);//从进程中的非托管内存分配内存
+                Marshal.StructureToPtr(m_struTimeCfg, ptrGetTimeCfg, false);//将数据从托管对象封送到非托管内存块
+
+                uint dwReturn = 0;
+
+                //获取DVR时间设置
+                if (!NET_DVR_GetDVRConfig(m_lUserID, NET_DVR_GET_TIMECFG, m_lChannel, ptrGetTimeCfg, dwSize, ref dwReturn))
+                {
+                    iLastErr = NET_DVR_GetLastError();
+                    strErr = $"获取NET_DVR_GET_TIMECFG失败, 错误号为：{iLastErr}";
+                    LogHelper.Error(strErr);
+
+                    HandyControl.Controls.Growl.Error(strErr);
+                }
+                else
+                {
+                    //停止录制时间
+                    _endRecordTime = new DateTime(m_struTimeCfg.dwYear, m_struTimeCfg.dwMonth, m_struTimeCfg.dwDay, m_struTimeCfg.dwHour, m_struTimeCfg.dwMinute, m_struTimeCfg.dwSecond);
+
+                    //入库
+                    AddJcRecord(testNo, dvrName);
+
+                    //回放
+                    _startRecordTime = _startRecordTime.AddSeconds(-0.00012);
+                    _endRecordTime = _endRecordTime.AddSeconds(0.00012);
+
+                    var result = StartPlayBack(_startRecordTime, _endRecordTime, intPtr);
+                    if (result)
+                    {
+                        uint iOutValue = 0;
+                        if (!NET_DVR_PlayBackControl_V40(m_lPlayHandle, NET_DVR_PLAYSTART, IntPtr.Zero, 0, IntPtr.Zero, ref iOutValue))
+                        {
+                            iLastErr = NET_DVR_GetLastError();
+                            strErr = "NET_DVR_PLAYSTART failed, error code= " + iLastErr; //回放控制失败，输出错误号
+
+                            LogHelper.Error(strErr);
+                            HandyControl.Controls.Growl.Error(strErr);
+
+                            return;
+                        }
+                        else
+                        {
+                            var lpLableIdentify = new NET_DVR_LABEL_IDENTIFY();
+                            var lpRecordLabel = new NET_DVR_RECORD_LABEL();
+
+                            lpRecordLabel.struTimeLabel = m_struTimeCfg;
+                            lpRecordLabel.byQuickAdd = 0;
+                            lpRecordLabel.sLabelName = System.Text.Encoding.UTF8.GetBytes(testNo);
+
+                            if (NET_DVR_InsertRecordLabel(m_lPlayHandle, lpRecordLabel, lpLableIdentify))
+                            {
+                                strErr = "停止录像并且增加标签成功！";
+
+                                LogHelper.Info(strErr);
+                                HandyControl.Controls.Growl.Info(strErr);
+                            }
+                            else
+                            {
+                                strErr = "NET_DVR_InsertRecordLabel failed, error code= " + iLastErr; //回放控制失败，输出错误号
+
+                                LogHelper.Error(strErr);
+                                HandyControl.Controls.Growl.Error(strErr);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 新增检测记录
+        /// </summary>
+        /// <param name="testNo"></param>
+        /// <param name="nvrName"></param>
+        private static void AddJcRecord(string testNo, string nvrName)
+        {
+            var sql = $"INSERT INTO JCRecord(JcNo,DVRName,startTime,stopTime) VALUES('{testNo}','{nvrName}','{_startRecordTime}','{_endRecordTime}')";
+            OleDbHelper.ExcuteSql(sql);
+        }
+
+        /// <summary>
+        /// 开始回放
+        /// </summary>
+        /// <param name="startTime"></param>
+        /// <param name="endTime"></param>
+        /// <param name="intPtr"></param>
+        public static bool StartPlayBack(DateTime startTime, DateTime endTime, IntPtr intPtr)
         {
             if (m_lPlayHandle >= 0)
             {
@@ -414,7 +581,7 @@ namespace GZKL.Client.UI.Common
                     LogHelper.Error(strErr);
                     HandyControl.Controls.Growl.Error(strErr);
 
-                    return;
+                    return false;
                 }
 
                 //m_bReverse = false;
@@ -432,8 +599,8 @@ namespace GZKL.Client.UI.Common
 
             NET_DVR_VOD_PARA struVodPara = new NET_DVR_VOD_PARA();
             struVodPara.dwSize = (uint)Marshal.SizeOf(struVodPara);
-            //struVodPara.struIDInfo.dwChannel = (uint)iChannelNum[(int)iSelIndex]; //通道号 Channel number  
-            //struVodPara.hWnd = VideoPlayWnd.Handle;//回放窗口句柄
+            struVodPara.struIDInfo.dwChannel = (uint)m_lChannel; //通道号 Channel number  
+            struVodPara.hWnd = intPtr;//回放窗口句柄
 
             //设置回放的开始时间 Set the starting time to search video files
             struVodPara.struBeginTime.dwYear = startTime.Year;
@@ -461,7 +628,7 @@ namespace GZKL.Client.UI.Common
                 LogHelper.Error(strErr);
                 HandyControl.Controls.Growl.Error(strErr);
 
-                return;
+                return false;
             }
 
             uint iOutValue = 0;
@@ -473,13 +640,18 @@ namespace GZKL.Client.UI.Common
                 LogHelper.Error(strErr);
                 HandyControl.Controls.Growl.Error(strErr);
 
-                return;
+                return false;
             }
             //timerPlayback.Interval = 1000;
             //timerPlayback.Enabled = true;
             //btnStopPlayback.Enabled = true;
+
+            return true;
         }
 
+        /// <summary>
+        /// 停止回放
+        /// </summary>
         public static void StopPlayBack()
         {
             if (m_lPlayHandle < 0)
@@ -514,6 +686,9 @@ namespace GZKL.Client.UI.Common
             //btnStopPlayback.Enabled = false;
         }
 
+        /// <summary>
+        /// 暂停回放
+        /// </summary>
         public static void PausePalyBack()
         {
             uint iOutValue = 0;
@@ -550,9 +725,6 @@ namespace GZKL.Client.UI.Common
             }
             return;
         }
-
-
-
 
 
         /// <summary>

@@ -27,9 +27,6 @@ namespace GZKL.Client.UI.ViewsModels
             this.RegisterCmd = new RelayCommand(this.Register);
             this.ExitCmd = new RelayCommand(this.Exit);
 
-            this.StartShootingCmd = new RelayCommand(this.StartShooting);
-            this.StopShootingCmd = new RelayCommand(this.StopShooting);
-
             //初始化数据
             InitData(loginSuccessModel);
 
@@ -83,10 +80,6 @@ namespace GZKL.Client.UI.ViewsModels
         public RelayCommand TimeSetCmd { get; set; }
         public RelayCommand RegisterCmd { get; set; }
         public RelayCommand ExitCmd { get; set; }
-
-
-        public RelayCommand StartShootingCmd { get; set; }
-        public RelayCommand StopShootingCmd { get; set; }
 
         #endregion
 
@@ -297,45 +290,6 @@ namespace GZKL.Client.UI.ViewsModels
             {
                 LogHelper.Error($"校时失败，{ex?.Message}");
             }
-        }
-
-        /// <summary>
-        /// 开始录像
-        /// </summary>
-        public void StartShooting()
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(Model.ChannelNo))
-                {
-                    HandyControl.Controls.Growl.Warning("请选择通道列表！");
-                    return;
-                }
-
-                if (string.IsNullOrEmpty(Model.ShootingTestNo))
-                {
-                    HandyControl.Controls.Growl.Warning("请输入检测编号！");
-                    return;
-                }
-
-                //设置屏幕窗口显示的字符串
-                HikvisionHelper.SetShowString(Model.ShootingTestNo);
-
-
-
-            }
-            catch (Exception ex)
-            {
-                LogHelper.Error($"开始录像失败，{ex?.Message}");
-            }
-        }
-
-        /// <summary>
-        /// 结束录像
-        /// </summary>
-        public void StopShooting()
-        {
-
         }
 
 
