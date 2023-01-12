@@ -19101,7 +19101,7 @@ namespace GZKL.Client.UI.Common
         */
 
         [DllImport(@".\HCNetSDK.dll")]
-        public static extern bool NET_DVR_InsertRecordLabel(Int32 lPlayHandle, NET_DVR_RECORD_LABEL struRecordLabel,ref NET_DVR_LABEL_IDENTIFY struLabelIdentify);
+        public static extern bool NET_DVR_InsertRecordLabel(Int32 lPlayHandle, NET_DVR_RECORD_LABEL struRecordLabel,NET_DVR_LABEL_IDENTIFY struLabelIdentify);
 
         [DllImport(@".\HCNetSDK.dll")]
         public static extern int NET_DVR_FindRecordLabel(Int32 lUserID, NET_DVR_FINDLABEL_DATA struFindLabel);
