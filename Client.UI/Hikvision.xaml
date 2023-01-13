@@ -4,7 +4,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:hc="https://handyorg.github.io/handycontrol"
-        xmlns:common="clr-namespace:GZKL.Client.UI.Common"
         mc:Ignorable="d"
         Height="800"
         Width="1400" 
@@ -19,7 +18,7 @@
         <WindowChrome CaptionHeight="0" ResizeBorderThickness="20"/>
     </WindowChrome.WindowChrome>
     <Window.Resources>
-        
+
         <Style TargetType="DataGrid">
             <Setter Property="RowHeaderWidth" Value="25"></Setter>
             <Setter Property="AutoGenerateColumns" Value="False"></Setter>
@@ -166,15 +165,15 @@
                                 </WrapPanel>
 
                                 <WrapPanel Margin="2">
-                                    <Button x:Name="btnStartPlay" Margin="3" Width="90" Content="开始回放" Command="{Binding StartPlayCmd}"/>
-                                    <Button x:Name="btnStopPlay" Margin="3" Width="90" Content="停止回放" Command="{Binding StopPlayCmd}"/>
+                                    <Button x:Name="btnStartPlay" Margin="3" Width="90" Content="开始回放" Command="{Binding StartPlayBackCmd}"/>
+                                    <Button x:Name="btnStopPlay" Margin="3" Width="90" Content="停止回放" Command="{Binding StopPlayBackCmd}"/>
                                     <Button x:Name="btnDownload" Margin="3" Width="90" Content="下载" Command="{Binding DownloadCmd}"/>
                                 </WrapPanel>
                                 <WrapPanel Margin="2">
-                                    <Button x:Name="btnPausePlay" Margin="3" Width="90" Content="暂停回放" Command="{Binding PausePlayCmd}"/>
-                                    <Button x:Name="btnRecoverPlay" Margin="3" Width="90" Content="恢复回放" Command="{Binding RecoverPlayCmd}"/>
-                                    <Button x:Name="btnFastPlay" Margin="3" Width="90" Content="快放" Command="{Binding FastPlayCmd}"/>
-                                    <Button x:Name="btnSlowPlay" Margin="3" Width="90" Content="慢放" Command="{Binding SlowPlayCmd}"/>
+                                    <Button x:Name="btnPausePlay" Margin="3" Width="90" Content="暂停回放" Command="{Binding PausePlayBackCmd}"/>
+                                    <Button x:Name="btnRecoverPlay" Margin="3" Width="90" Content="恢复回放" Command="{Binding RecoverPlayBackCmd}"/>
+                                    <Button x:Name="btnFastPlay" Margin="3" Width="90" Content="快放" Command="{Binding FastPlayBackCmd}"/>
+                                    <Button x:Name="btnSlowPlay" Margin="3" Width="90" Content="慢放" Command="{Binding SlowPlayBackCmd}"/>
                                 </WrapPanel>
                             </StackPanel>
                         </GroupBox>
@@ -184,6 +183,7 @@
                                           Background="White"
                                           x:Name="dgTestData"
                                           hc:Empty.ShowEmpty="True"
+                                          SelectionMode="Single"
                                           ItemsSource="{Binding Model.TestData}" >
 
                         <DataGrid.Columns>
@@ -191,6 +191,11 @@
                             <DataGridTextColumn IsReadOnly="True" Width="120*" Binding="{Binding StartDt, StringFormat=\{0:yyyy-MM-dd HH:mm:ss\}, Mode=OneWay}"  SortMemberPath="StartDt" Header="开始时间"/>
                             <DataGridTextColumn IsReadOnly="True" Width="120*" Binding="{Binding EndDt, StringFormat=\{0:yyyy-MM-dd HH:mm:ss\}, Mode=OneWay}"  SortMemberPath="EndDt" Header="结束时间"/>
                         </DataGrid.Columns>
+                        <hc:Interaction.Triggers>
+                            <hc:EventTrigger EventName="SelectionChanged">
+                                <hc:InvokeCommandAction Command="{Binding DataGridSelectionChangedCmd}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}" />
+                            </hc:EventTrigger>
+                        </hc:Interaction.Triggers>
                     </DataGrid>
                 </Grid>
             </Grid>

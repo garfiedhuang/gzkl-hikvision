@@ -1,4 +1,5 @@
 ﻿using GalaSoft.MvvmLight;
+using System;
 
 namespace GZKL.Client.UI.Models
 {
@@ -62,5 +63,15 @@ namespace GZKL.Client.UI.Models
         public string DeviceIp { get; set; }
         public int ChannelNo { get; set; }
         public int NVRID { get; set; }
+    }
+
+    /// <summary>
+    /// 检测数据
+    /// </summary>
+    public class TestData
+    {
+        public int ChannelNo { get; set; }
+        public DateTime StartDt { get; set; }
+        public DateTime EndDt { get; set; }
     }
 }

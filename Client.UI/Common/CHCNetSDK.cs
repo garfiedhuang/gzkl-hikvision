@@ -19100,17 +19100,36 @@ namespace GZKL.Client.UI.Common
 
         */
 
+        /*
+         * 
+         * 
+函 数： BOOL NET_DVR_InsertRecordLabel(LONG lPlayHandle, NET_DVR_RECORD_LABEL* lpRecordLabel,
+NET_DVR_LABEL_IDENTIFY *lpLableIdentify)
+参 数： [in]lPlayHandle
+[in]lpRecordLabel
+[out]lpLableIdentify
+NET_DVR_PlayBackByName 或 NET_DVR_PlayBackByTime_V40 的
+返回值
+录像标签
+添加录像标签后的标识
+返回值： TRUE 表示成功，FALSE 表示失败。接口返回失败请调用 NET_DVR_GetLastError 获取错误码，通
+过错误码判断出错原因。
+说 明： 录像标签功能可帮助用户在回放录像时记录下某一时间点的相关人员或现场等信息，以便后续
+随时根据标签信息，进行搜索和定位录像资料。
+
+         * 
+         */
         [DllImport(@".\HCNetSDK.dll")]
-        public static extern bool NET_DVR_InsertRecordLabel(Int32 lPlayHandle, NET_DVR_RECORD_LABEL struRecordLabel,NET_DVR_LABEL_IDENTIFY struLabelIdentify);
+        public static extern bool NET_DVR_InsertRecordLabel(int lPlayHandle, NET_DVR_RECORD_LABEL lpRecordLabel, ref NET_DVR_LABEL_IDENTIFY lpLabelIdentify);
 
         [DllImport(@".\HCNetSDK.dll")]
-        public static extern int NET_DVR_FindRecordLabel(Int32 lUserID, NET_DVR_FINDLABEL_DATA struFindLabel);
+        public static extern int NET_DVR_FindRecordLabel(int lUserID,NET_DVR_FINDLABEL_DATA struFindLabel);
 
         [DllImport(@".\HCNetSDK.dll")]
-        public static extern int NET_DVR_FindNextLabel(Int32 lFindHandle, NET_DVR_FINDLABEL_DATA struFindLabelData);
+        public static extern int NET_DVR_FindNextLabel(int lFindHandle,NET_DVR_FINDLABEL_DATA struFindLabelData);
 
         [DllImport(@".\HCNetSDK.dll")]
-        public static extern bool NET_DVR_StopFindLabel(Int32 lFindHandle);
+        public static extern bool NET_DVR_StopFindLabel(int lFindHandle);
 
 
         /*****************新加方法：Add by garfield 20230111 => end *****************/

@@ -7,11 +7,8 @@ using System;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Data.SqlClient;
 using System.Data;
-using System.Text;
-using System.Windows;
-using System.Windows.Interop;
+using GZKL.Client.UI.Views.SystemMgt.Config;
 
 namespace GZKL.Client.UI.ViewsModels
 {
@@ -26,6 +23,17 @@ namespace GZKL.Client.UI.ViewsModels
             this.TimeSetCmd = new RelayCommand(this.TimeSet);
             this.RegisterCmd = new RelayCommand(this.Register);
             this.ExitCmd = new RelayCommand(this.Exit);
+            this.QueryCmd = new RelayCommand(this.Query);
+
+            this.StartPlayBackCmd = new RelayCommand(this.StartPlayBack);
+            this.StopPlayBackCmd = new RelayCommand(this.StopPlayBack);
+            this.DownloadCmd = new RelayCommand(this.Download);
+            this.PausePlayBackCmd = new RelayCommand(this.PausePlayBack);
+            this.RecoverPlayBackCmd = new RelayCommand(this.RecoverPlayBack);
+            this.FastPlayBackCmd = new RelayCommand(this.FastPlayBack);
+            this.SlowPlayBackCmd = new RelayCommand(this.SlowPlayBack);
+
+            this.DataGridSelectionChangedCmd = new RelayCommand<object>(this.DataGridSelectionChanged);
 
             //初始化数据
             InitData(loginSuccessModel);
@@ -46,10 +54,11 @@ namespace GZKL.Client.UI.ViewsModels
         public HikvisionModel Model
         {
             get { return model; }
-            set {
+            set
+            {
                 model = value;
                 RaisePropertyChanged();
-                HikvisionHelper.m_lChannel=Convert.ToInt32(value);//设置当前选中的通道
+                HikvisionHelper.m_lChannel = Convert.ToInt32(value);//设置当前选中的通道
             }
         }
 
@@ -73,6 +82,16 @@ namespace GZKL.Client.UI.ViewsModels
             set { dvrData = value; RaisePropertyChanged(); }
         }
 
+        /// <summary>
+        /// 检测数据模型
+        /// </summary>
+        private ObservableCollection<TestData> testData;
+        public ObservableCollection<TestData> TestData
+        {
+            get { return testData; }
+            set { testData = value; RaisePropertyChanged(); }
+        }
+
         #endregion
 
         #region ====cmd
@@ -80,8 +99,19 @@ namespace GZKL.Client.UI.ViewsModels
         public RelayCommand TimeSetCmd { get; set; }
         public RelayCommand RegisterCmd { get; set; }
         public RelayCommand ExitCmd { get; set; }
+        public RelayCommand QueryCmd { get; set; }
+        public RelayCommand StartPlayBackCmd { get; set; }
+        public RelayCommand StopPlayBackCmd { get; set; }
+        public RelayCommand DownloadCmd { get; set; }
+        public RelayCommand PausePlayBackCmd { get; set; }
+        public RelayCommand RecoverPlayBackCmd { get; set; }
+        public RelayCommand FastPlayBackCmd { get; set; }
+        public RelayCommand SlowPlayBackCmd { get; set; }
+        public RelayCommand<object> DataGridSelectionChangedCmd { get; set; }
 
         #endregion
+
+        #region 初始化
 
         /// <summary>
         /// 初始化数据
@@ -167,6 +197,10 @@ namespace GZKL.Client.UI.ViewsModels
                 LogHelper.Error($"登录NVR失败，{ex?.Message}");
             }
         }
+
+        #endregion
+
+        #region 录像
 
         /// <summary>
         /// 退出
@@ -292,6 +326,189 @@ namespace GZKL.Client.UI.ViewsModels
             }
         }
 
+        #endregion
+
+        #region 回放
+
+        /// <summary>
+        /// 查询
+        /// </summary>
+        public void Query()
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(Model.TestNo))
+                {
+                    HandyControl.Controls.Growl.Warning("请输入检测编号！");
+                    return;
+                }
+
+                var sql = $"SELECT * FROM JCRecord WHERE JCNO LIKE '%{Model.TestNo}%'";
+
+                using (var dt = OleDbHelper.DataTable(sql))
+                {
+                    if (TestData == null)
+                    {
+                        TestData = new ObservableCollection<TestData>();
+                    }
+                    else
+                    {
+                        TestData.Clear();
+                    }
+
+                    if (dt == null || dt.Rows.Count == 0)
+                    {
+                        return;
+                    }
+
+                    foreach (DataRow dr in dt.Rows)
+                    {
+                        TestData.Add(new Models.TestData()
+                        {
+                            ChannelNo = Convert.ToInt32(dr["ChannelNo"]),
+                            StartDt = Convert.ToDateTime(dr["StartDt"]),
+                            EndDt = Convert.ToDateTime(dr["EndDt"])
+                        });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error($"查询失败，{ex?.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 开始回放
+        /// </summary>
+        private void StartPlayBack()
+        {
+            try
+            {
+                var intPtr = Model.MePreview;
+                var startDt = Model.SelectedTestData.StartDt.AddSeconds(-0.00012);
+                var endDt = Model.SelectedTestData.EndDt.AddSeconds(0.00012);
+
+                var result = HikvisionHelper.StartPlayBack(startDt, endDt, intPtr);
+
+                if (!result)
+                {
+
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error($"开始回放失败，{ex?.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 停止回放
+        /// </summary>
+        private void StopPlayBack()
+        {
+            try
+            {
+                HikvisionHelper.StopPlayBack();
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error($"停止回放失败，{ex?.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 下载
+        /// </summary>
+        private void Download()
+        {
+            try
+            {
+
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error($"下载失败，{ex?.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 暂停回放
+        /// </summary>
+        private void PausePlayBack()
+        {
+            try
+            {
+
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error($"暂停回放失败，{ex?.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 恢复回放
+        /// </summary>
+        private void RecoverPlayBack()
+        {
+            try
+            {
+
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error($"恢复回放失败，{ex?.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 快速回放
+        /// </summary>
+        private void FastPlayBack()
+        {
+            try
+            {
+
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error($"快速回放失败，{ex?.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 慢速回放
+        /// </summary>
+        private void SlowPlayBack()
+        {
+            try
+            {
+
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error($"慢速回放失败，{ex?.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 网格选中事件
+        /// </summary>
+        /// <param name="selectedItem"></param>
+        private void DataGridSelectionChanged(object selectedItem)
+        {
+            if (selectedItem == null)
+            {
+                HandyControl.Controls.Growl.Warning("请选择检测记录！");
+                return;
+            }
+            var item = selectedItem as TestData;
+
+            Model.SelectedTestData = item;
+        }
+
+        #endregion
 
         #region 私有方法
 
@@ -321,7 +538,6 @@ namespace GZKL.Client.UI.ViewsModels
                 }
             }));
         }
-
 
         #endregion
 

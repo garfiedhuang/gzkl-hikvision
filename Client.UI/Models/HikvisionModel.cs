@@ -67,5 +67,16 @@ namespace GZKL.Client.UI.Models
             get { return progressBarValue; }
             set { progressBarValue = value; RaisePropertyChanged(); }
         }
+
+
+        /// <summary>
+        /// 选择的检测项
+        /// </summary>
+        private TestData selectedTestData;
+        public TestData SelectedTestData
+        {
+            get { return selectedTestData; }
+            set { selectedTestData = value; RaisePropertyChanged(); }
+        }
     }
 }

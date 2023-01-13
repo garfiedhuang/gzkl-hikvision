@@ -531,7 +531,7 @@ namespace GZKL.Client.UI.Common
                             lpRecordLabel.byQuickAdd = 0;
                             lpRecordLabel.sLabelName = System.Text.Encoding.UTF8.GetBytes(testNo);
 
-                            if (NET_DVR_InsertRecordLabel(m_lPlayHandle, lpRecordLabel, lpLableIdentify))
+                            if (NET_DVR_InsertRecordLabel(m_lPlayHandle, lpRecordLabel,ref lpLableIdentify))
                             {
                                 strErr = "停止录像并且增加标签成功！";
 
